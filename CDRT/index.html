@@ -103,7 +103,7 @@
       text-align: left;
       white-space: nowrap;
     }
-    .pub-th-year { text-align: center; width: 5rem; }
+    .pub-th-year { text-align: center; width: 20%; }
     .pub-td {
       padding: 0.8rem 1.25rem;
       border-bottom: 1px solid #f0efed;
@@ -117,14 +117,16 @@
       font-weight: 500;
     }
     .pub-td-journal {
+      width: 20%;
       font-weight: 700;
       font-style: italic;
       color: #292524;
-      white-space: nowrap;
+      white-space: normal;
+      word-break: break-word;
     }
     .pub-td-year {
       text-align: center;
-      width: 5rem;
+      width: 20%;
     }
     .pub-year-badge {
       display: inline-block;
@@ -138,6 +140,7 @@
     .pub-y-2024 { background: #fef2f2; color: #991b1b; }
     .pub-y-default { background: #fafaf9; color: #57534e; }
 
+    #pubTable { table-layout: fixed; }
     #pubTable thead { position: sticky; top: 0; z-index: 10; }
     #pubTable tbody tr:nth-child(even) { background-color: #fafaf9; }
     #pubTable tbody tr { transition: background-color 0.25s, box-shadow 0.25s; }
@@ -367,8 +370,8 @@
           <thead>
             <tr>
               <th class="pub-th pub-th-title" style="width:60%;">Title</th>
-              <th class="pub-th pub-th-journal">Journal</th>
-              <th class="pub-th pub-th-year">Year</th>
+              <th class="pub-th pub-th-journal" style="width:20%;">Journal</th>
+              <th class="pub-th pub-th-year" style="width:20%;">Year</th>
             </tr>
           </thead>
           <tbody id="pubBody">
@@ -842,6 +845,7 @@
 
       // 发表论文数据（制表符分割文本直接硬编码，按年份降序排列）
       var paperRaw = [
+        "Mutually beneficial interactions between bacteria and Arabidopsis promote phosphorus nutrition and growth\tCell\t2026",
         "A regulatory network promotes apoplastic alkalinization to prime plant immunity in tissues distal to site of infection\tCell\t2026",
         "New alleles of Arabidopsis BIK1 reinforce its predominant role in pattern-triggered immunity and caution interpretations of other reported functions\tNature Plants\t2026",
         "A fungal two-in-one trick\tNature Plants\t2026",
@@ -887,6 +891,21 @@
             year:    parseInt(cols[2]) || 0
           });
         }
+
+        // 按期刊优先级排序：Science / Cell / Nature 三大类优先，其余按字母序
+        function journalRank(journal) {
+          var j = journal.trim().toLowerCase();
+          if (j.startsWith('science')) return 0;                           // Science 系
+          if (j.startsWith('cell')) return 1;                              // Cell 系
+          if (j.startsWith('nature') || j.startsWith('nat ')) return 2;   // Nature 系（含 Nat Genet）
+          return 3;                                                        // 其他
+        }
+        papers.sort(function(a, b) {
+          var ra = journalRank(a.journal);
+          var rb = journalRank(b.journal);
+          if (ra !== rb) return ra - rb;
+          return a.journal.toLowerCase().localeCompare(b.journal.toLowerCase());
+        });
 
         document.getElementById('pubCount').textContent = '共 ' + papers.length + ' 篇';
 
