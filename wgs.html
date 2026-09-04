@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>群体重测序变异检测 | 未特生物</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'Noto Sans SC', 'sans-serif'] },
+                    colors: {
+                        brand: { 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca' },
+                        accent: { 500: '#06b6d4', 600: '#0891b2' }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', 'Noto Sans SC', sans-serif; }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #6366f1 0%, #06b6d4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-bg {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glow {
+            box-shadow: 0 0 60px rgba(99, 102, 241, 0.3);
+        }
+
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .float-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+        .pulse-ring::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: inherit;
+            border: 2px solid currentColor;
+            animation: pulse-ring 2s ease-out infinite;
+        }
+
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-700 antialiased">
+
+    <!-- ========== HERO ========== -->
+    <section class="hero-bg text-white relative overflow-hidden">
+        <!-- 背景装饰 -->
+        <div class="absolute inset-0 overflow-hidden">
+            <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-cyan-500/20 rounded-full blur-3xl"></div>
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] border border-white/5 rounded-full"></div>
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] border border-white/5 rounded-full"></div>
+        </div>
+
+        <div class="container mx-auto px-6 pt-20 pb-28 relative z-10">
+            <!-- 顶部品牌 -->
+            <div class="flex items-center justify-between mb-20">
+                <span class="font-bold text-xl">未特生物</span>
+                <a href="#calculator" class="glass px-5 py-2 rounded-full text-sm font-medium hover:bg-white/10 transition-colors">
+                    获取报价
+                </a>
+            </div>
+
+            <!-- 主标题区 -->
+            <div class="max-w-4xl mx-auto text-center">
+                <div class="inline-flex items-center gap-2 glass px-4 py-2 rounded-full text-sm text-indigo-300 mb-8">
+                    <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
+                    生信分析技术服务
+                </div>
+
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6">
+                    群体重测序<br>
+                    <span class="gradient-text">变异检测</span>解决方案
+                </h1>
+
+                <p class="text-xl text-slate-400 mb-10 max-w-2xl mx-auto">
+                    基于标准流程获得 SNP/InDel 位点<br class="hidden sm:block">
+                    极速并行 · 效果稳健 · 学术级交付
+                </p>
+
+                <!-- 核心指标 -->
+                <div class="flex flex-wrap justify-center gap-8 mb-12">
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-white mb-1">10,000+</div>
+                        <div class="text-sm text-slate-500">CPU核心</div>
+                    </div>
+                    <div class="w-px h-12 bg-slate-700 hidden sm:block"></div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-white mb-1">数天</div>
+                        <div class="text-sm text-slate-500">完成分析</div>
+                    </div>
+                    <div class="w-px h-12 bg-slate-700 hidden sm:block"></div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-white mb-1">VCF</div>
+                        <div class="text-sm text-slate-500">标准交付</div>
+                    </div>
+                </div>
+
+                <a href="#calculator" class="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-semibold px-8 py-4 rounded-xl transition-all glow">
+                    开始计算报价
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== 核心优势 ========== -->
+    <section class="py-20 bg-white">
+        <div class="container mx-auto px-6 max-w-6xl">
+            <div class="text-center mb-14">
+                <h2 class="text-3xl font-bold text-slate-900 mb-4">核心优势</h2>
+                <p class="text-slate-500">企业级算力平台，解决计算资源瓶颈</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="p-6 bg-gradient-to-b from-slate-50 to-white rounded-2xl border border-slate-100 card-hover">
+                    <div class="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center mb-4">
+                        <i class="bi bi-hdd-stack text-indigo-600 text-xl"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-900 mb-2">海量算力</h3>
+                    <p class="text-sm text-slate-500">上万CPU核心HPC集群，从容应对大规模群体分析</p>
+                </div>
+
+                <div class="p-6 bg-gradient-to-b from-slate-50 to-white rounded-2xl border border-slate-100 card-hover">
+                    <div class="w-12 h-12 bg-cyan-100 rounded-xl flex items-center justify-center mb-4">
+                        <i class="bi bi-lightning-charge text-cyan-600 text-xl"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-900 mb-2">极速并行</h3>
+                    <p class="text-sm text-slate-500">自研框架，数月任务数天完成</p>
+                </div>
+
+                <div class="p-6 bg-gradient-to-b from-slate-50 to-white rounded-2xl border border-slate-100 card-hover">
+                    <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center mb-4">
+                        <i class="bi bi-shield-check text-emerald-600 text-xl"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-900 mb-2">金标准流程</h3>
+                    <p class="text-sm text-slate-500">GATK标准流程，学术级结果交付</p>
+                </div>
+
+                <div class="p-6 bg-gradient-to-b from-slate-50 to-white rounded-2xl border border-slate-100 card-hover">
+                    <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center mb-4">
+                        <i class="bi bi-grid-3x3 text-amber-600 text-xl"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-900 mb-2">多物种支持</h3>
+                    <p class="text-sm text-slate-500">水稻、小麦、玉米、大豆等作物全覆盖</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== 应用场景 ========== -->
+    <section class="py-20 bg-slate-50">
+        <div class="container mx-auto px-6 max-w-6xl">
+            <div class="text-center mb-14">
+                <h2 class="text-3xl font-bold text-slate-900 mb-4">应用场景</h2>
+                <p class="text-slate-500">全面支持现代分子育种与基础科研</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white rounded-2xl p-8 shadow-sm card-hover relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-indigo-100 to-transparent rounded-bl-full"></div>
+                    <div class="relative">
+                        <div class="w-14 h-14 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl flex items-center justify-center mb-5 shadow-lg shadow-indigo-500/30">
+                            <i class="bi bi-graph-up text-white text-xl"></i>
+                        </div>
+                        <h3 class="font-bold text-lg text-slate-900 mb-2">GWAS分析</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed">
+                            高密度分子标记，精准定位关键功能基因
+                        </p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-8 shadow-sm card-hover relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-cyan-100 to-transparent rounded-bl-full"></div>
+                    <div class="relative">
+                        <div class="w-14 h-14 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-2xl flex items-center justify-center mb-5 shadow-lg shadow-cyan-500/30">
+                            <i class="bi bi-tree text-white text-xl"></i>
+                        </div>
+                        <h3 class="font-bold text-lg text-slate-900 mb-2">群体进化</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed">
+                            解析演化历史，挖掘受选择区段
+                        </p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-8 shadow-sm card-hover relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-emerald-100 to-transparent rounded-bl-full"></div>
+                    <div class="relative">
+                        <div class="w-14 h-14 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center mb-5 shadow-lg shadow-emerald-500/30">
+                            <i class="bi bi-map text-white text-xl"></i>
+                        </div>
+                        <h3 class="font-bold text-lg text-slate-900 mb-2">分子育种</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed">
+                            种质鉴定、GS育种、MAS标记辅助
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== 分析流程 ========== -->
+    <section class="py-20 bg-white">
+        <div class="container mx-auto px-6 max-w-6xl">
+            <div class="text-center mb-14">
+                <h2 class="text-3xl font-bold text-slate-900 mb-4">分析流程</h2>
+                <p class="text-slate-500">GATK金标准流程，确保结果可重复性</p>
+            </div>
+
+            <div class="flex flex-wrap justify-center gap-4">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-indigo-600 text-white rounded-xl flex items-center justify-center font-bold text-sm">1</div>
+                    <div class="ml-3">
+                        <div class="text-sm font-semibold text-slate-800">数据质控</div>
+                    </div>
+                </div>
+                <i class="bi bi-chevron-right text-slate-300 hidden sm:block"></i>
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-indigo-600 text-white rounded-xl flex items-center justify-center font-bold text-sm">2</div>
+                    <div class="ml-3">
+                        <div class="text-sm font-semibold text-slate-800">序列比对</div>
+                    </div>
+                </div>
+                <i class="bi bi-chevron-right text-slate-300 hidden sm:block"></i>
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-indigo-600 text-white rounded-xl flex items-center justify-center font-bold text-sm">3</div>
+                    <div class="ml-3">
+                        <div class="text-sm font-semibold text-slate-800">重复标记</div>
+                    </div>
+                </div>
+                <i class="bi bi-chevron-right text-slate-300 hidden sm:block"></i>
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-indigo-600 text-white rounded-xl flex items-center justify-center font-bold text-sm">4</div>
+                    <div class="ml-3">
+                        <div class="text-sm font-semibold text-slate-800">变异检测</div>
+                    </div>
+                </div>
+                <i class="bi bi-chevron-right text-slate-300 hidden sm:block"></i>
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-cyan-600 text-white rounded-xl flex items-center justify-center font-bold text-sm">5</div>
+                    <div class="ml-3">
+                        <div class="text-sm font-semibold text-slate-800">联合分型</div>
+                    </div>
+                </div>
+                <i class="bi bi-chevron-right text-slate-300 hidden sm:block"></i>
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-cyan-600 text-white rounded-xl flex items-center justify-center font-bold text-sm">6</div>
+                    <div class="ml-3">
+                        <div class="text-sm font-semibold text-slate-800">变异过滤</div>
+                    </div>
+                </div>
+                <i class="bi bi-chevron-right text-slate-300 hidden sm:block"></i>
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-emerald-600 text-white rounded-xl flex items-center justify-center font-bold text-sm">7</div>
+                    <div class="ml-3">
+                        <div class="text-sm font-semibold text-slate-800">结果交付</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== 报价计算器 ========== -->
+    <section id="calculator" class="py-20 bg-slate-50">
+        <div class="container mx-auto px-6 max-w-6xl">
+            <div class="text-center mb-14">
+                <h2 class="text-3xl font-bold text-slate-900 mb-4">报价计算器</h2>
+                <p class="text-slate-500">透明定价，精准预估项目成本</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                <!-- 参数输入 -->
+                <div class="lg:col-span-3 space-y-6">
+                    <div class="bg-white rounded-2xl p-8 shadow-sm">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
+                                <i class="bi bi-sliders text-indigo-600"></i>
+                            </div>
+                            <h3 class="font-bold text-slate-900">项目参数</h3>
+                        </div>
+
+                        <!-- 物种选择 -->
+                        <div class="mb-6">
+                            <label class="text-sm font-semibold text-slate-700 mb-3 block">物种类型</label>
+                            <div class="grid grid-cols-4 gap-3">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="species" value="wheat" class="peer sr-only" checked>
+                                    <div class="p-3 text-center border-2 border-slate-200 rounded-xl peer-checked:border-indigo-500 peer-checked:bg-indigo-50 transition-all">
+                                        <span class="text-xl">🌾</span>
+                                        <span class="block text-xs font-medium text-slate-700 mt-1">小麦</span>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="species" value="rice" class="peer sr-only">
+                                    <div class="p-3 text-center border-2 border-slate-200 rounded-xl peer-checked:border-indigo-500 peer-checked:bg-indigo-50 transition-all">
+                                        <span class="text-xl">🍚</span>
+                                        <span class="block text-xs font-medium text-slate-700 mt-1">水稻</span>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="species" value="maize" class="peer sr-only">
+                                    <div class="p-3 text-center border-2 border-slate-200 rounded-xl peer-checked:border-indigo-500 peer-checked:bg-indigo-50 transition-all">
+                                        <span class="text-xl">🌽</span>
+                                        <span class="block text-xs font-medium text-slate-700 mt-1">玉米</span>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="species" value="soybean" class="peer sr-only">
+                                    <div class="p-3 text-center border-2 border-slate-200 rounded-xl peer-checked:border-indigo-500 peer-checked:bg-indigo-50 transition-all">
+                                        <span class="text-xl">🫘</span>
+                                        <span class="block text-xs font-medium text-slate-700 mt-1">大豆</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- 参数网格 -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                            <div>
+                                <label class="text-sm font-semibold text-slate-700 mb-2 block">基因组大小</label>
+                                <div class="relative">
+                                    <input type="number" id="input_ref_size" value="15" step="0.1"
+                                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none">
+                                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-slate-500">Gb</span>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-sm font-semibold text-slate-700 mb-2 block">样本数量</label>
+                                <input type="number" id="input_sample_num" value="447"
+                                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="text-sm font-semibold text-slate-700 mb-2 block">测序深度</label>
+                                <div class="relative">
+                                    <input type="number" id="input_deep" value="12"
+                                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none">
+                                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-slate-500">X</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 数据总量 -->
+                        <div class="p-4 bg-gradient-to-r from-indigo-50 to-cyan-50 rounded-xl border border-indigo-100">
+                            <div class="flex items-center justify-between mb-2">
+                                <label class="text-sm font-semibold text-indigo-900">原始数据体积 (fq.gz)</label>
+                                <button type="button" id="btn-recalc" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium">
+                                    <i class="bi bi-arrow-clockwise mr-1"></i>重算
+                                </button>
+                            </div>
+                            <div class="relative">
+                                <input type="number" id="input_fq_size" value="80000"
+                                    class="w-full px-4 py-3 bg-white border border-indigo-200 rounded-xl font-bold text-indigo-900 focus:ring-2 focus:ring-indigo-500 outline-none">
+                                <span class="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-medium text-indigo-600">GB</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 费用说明 -->
+                    <div class="bg-white rounded-2xl p-6 shadow-sm">
+                        <h4 class="font-semibold text-slate-800 mb-4">费用计算说明</h4>
+                        <div class="space-y-3 text-sm">
+                            <div class="p-3 bg-slate-50 rounded-lg">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="font-medium text-slate-700">S1-变异检测</span>
+                                    <span class="font-semibold text-indigo-600">测序量 × 0.17元/GB</span>
+                                </div>
+                                <p class="text-xs text-slate-500">基于总测序数据量，含质控、比对、变异检测</p>
+                            </div>
+                            <div class="p-3 bg-slate-50 rounded-lg">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="font-medium text-slate-700">S2-联合分析</span>
+                                    <span class="font-semibold text-cyan-600">样本数×基因组×系数</span>
+                                </div>
+                                <p class="text-xs text-slate-500">多样本VCF合并，样本越多单价越低</p>
+                            </div>
+                            <div class="p-3 bg-slate-50 rounded-lg">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="font-medium text-slate-700">存储成本</span>
+                                    <span class="font-semibold text-emerald-600">1.73元/TB/天</span>
+                                </div>
+                                <p class="text-xs text-slate-500">按实际存储量与耗时计费</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 报价结果 -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden sticky top-6">
+                        <div class="bg-gradient-to-r from-slate-800 to-slate-900 p-6 text-white">
+                            <p class="text-slate-400 text-sm mb-1">预估费用</p>
+                            <div class="flex items-baseline gap-1">
+                                <span class="text-lg text-indigo-400">¥</span>
+                                <span id="total-cost" class="text-4xl font-bold">0</span>
+                            </div>
+                            <div id="discount_badge" class="hidden mt-3">
+                                <span class="inline-flex items-center bg-gradient-to-r from-indigo-500 to-cyan-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                                    规模优惠已生效
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="p-5 space-y-3">
+                            <div class="flex justify-between items-center py-2 border-b border-slate-100">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-8 h-8 bg-indigo-50 rounded-lg flex items-center justify-center">
+                                        <i class="bi bi-cpu text-indigo-600 text-sm"></i>
+                                    </div>
+                                    <span class="text-sm text-slate-600">S1-变异检测</span>
+                                </div>
+                                <span class="text-sm font-semibold">¥<span id="cost-gvcf">0</span></span>
+                            </div>
+                            <div class="flex justify-between items-center py-2 border-b border-slate-100">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-8 h-8 bg-cyan-50 rounded-lg flex items-center justify-center">
+                                        <i class="bi bi-diagram-3 text-cyan-600 text-sm"></i>
+                                    </div>
+                                    <span class="text-sm text-slate-600">S2-联合分析</span>
+                                </div>
+                                <span class="text-sm font-semibold">¥<span id="cost-con">0</span></span>
+                            </div>
+                            <div class="flex justify-between items-center py-2 border-b border-slate-100">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center">
+                                        <i class="bi bi-hdd text-emerald-600 text-sm"></i>
+                                    </div>
+                                    <span class="text-sm text-slate-600">存储成本</span>
+                                </div>
+                                <span class="text-sm font-semibold">¥<span id="cost-disk">0</span></span>
+                            </div>
+                            <div id="discount_row" class="hidden py-2 bg-indigo-50 -mx-5 px-5">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-indigo-700">规模优惠</span>
+                                    <span class="text-sm text-indigo-600">系数 <span id="discount_rate">50</span>%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-5 bg-slate-50 space-y-3">
+                            <button onclick="showContact()" class="w-full py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white font-semibold rounded-xl transition-all shadow-lg shadow-indigo-500/25">
+                                联系获取正式报价
+                            </button>
+                            <p class="text-center text-xs text-slate-400">报价仅供参考，以合同为准</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== 联系我们 ========== -->
+    <section id="contact" class="py-20 bg-white">
+        <div class="container mx-auto px-6 max-w-4xl">
+            <div class="text-center mb-14">
+                <h2 class="text-3xl font-bold text-slate-900 mb-4">联系我们</h2>
+                <p class="text-slate-500">专业团队为您提供评估与报价</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- 所需信息 -->
+                <div class="bg-slate-50 rounded-2xl p-6">
+                    <h4 class="font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                        <i class="bi bi-clipboard-check text-indigo-600"></i>
+                        咨询所需信息
+                    </h4>
+                    <ul class="space-y-2 text-sm text-slate-600">
+                        <li class="flex items-center gap-2"><i class="bi bi-check text-indigo-500"></i>物种名称</li>
+                        <li class="flex items-center gap-2"><i class="bi bi-check text-indigo-500"></i>参考基因组版本</li>
+                        <li class="flex items-center gap-2"><i class="bi bi-check text-indigo-500"></i>物种倍性</li>
+                        <li class="flex items-center gap-2"><i class="bi bi-check text-indigo-500"></i>样本数量</li>
+                        <li class="flex items-center gap-2"><i class="bi bi-check text-indigo-500"></i>测序深度</li>
+                        <li class="flex items-center gap-2"><i class="bi bi-check text-indigo-500"></i>原始数据体积</li>
+                    </ul>
+                </div>
+
+                <!-- 联系方式 -->
+                <div class="bg-slate-50 rounded-2xl p-6">
+                    <h4 class="font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                        <i class="bi bi-person-lines-fill text-indigo-600"></i>
+                        联系方式
+                    </h4>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-slate-600">联系人</span>
+                            <span class="font-semibold text-slate-800">官老师</span>
+                        </div>
+                        <a href="tel:13208994525" class="flex items-center justify-between p-3 bg-white rounded-xl hover:bg-indigo-50 transition-colors">
+                            <div class="flex items-center gap-2">
+                                <i class="bi bi-telephone text-indigo-600"></i>
+                                <span class="text-sm text-slate-600">电话</span>
+                            </div>
+                            <span class="font-semibold text-slate-800">13208994525</span>
+                        </a>
+                        <a href="mailto:weiteshengwu_wheat@163.com" class="flex items-center justify-between p-3 bg-white rounded-xl hover:bg-indigo-50 transition-colors">
+                            <div class="flex items-center gap-2">
+                                <i class="bi bi-envelope text-indigo-600"></i>
+                                <span class="text-sm text-slate-600">邮箱</span>
+                            </div>
+                            <span class="text-sm font-medium text-slate-800">weiteshengwu_wheat@163.com</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== Footer ========== -->
+    <footer class="bg-slate-900 text-white py-12">
+        <div class="container mx-auto px-6 max-w-6xl">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                <span class="font-bold text-xl">未特生物</span>
+                <div class="flex items-center gap-6 text-sm text-slate-400">
+                    <span>水稻</span>
+                    <span>小麦</span>
+                    <span>玉米</span>
+                    <span>大豆</span>
+                </div>
+                <p class="text-sm text-slate-500">&copy; 2025 未特生物. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ========== JavaScript ========== -->
+    <script>
+        const elRefSize = document.getElementById('input_ref_size');
+        const elSampleNum = document.getElementById('input_sample_num');
+        const elDeep = document.getElementById('input_deep');
+        const elFqSize = document.getElementById('input_fq_size');
+        const elCostGvcf = document.getElementById('cost-gvcf');
+        const elCostCon = document.getElementById('cost-con');
+        const elCostDisk = document.getElementById('cost-disk');
+        const elTotalCost = document.getElementById('total-cost');
+        const elDiscountBadge = document.getElementById('discount_badge');
+        const elDiscountRate = document.getElementById('discount_rate');
+        const elDiscountRow = document.getElementById('discount_row');
+        const elDiscountAmount = document.getElementById('discount_amount');
+        const btnRecalc = document.getElementById('btn-recalc');
+
+        const speciesGenomeSize = { wheat: 15, rice: 0.43, maize: 2.1, soybean: 1.1 };
+        const formatter = new Intl.NumberFormat('zh-CN');
+
+        function animateNumber(el, target) {
+            const start = parseFloat(el.textContent.replace(/,/g, '')) || 0;
+            const duration = 400;
+            const startTime = performance.now();
+            function update(time) {
+                const progress = Math.min((time - startTime) / duration, 1);
+                el.textContent = formatter.format(start + (target - start) * (1 - Math.pow(1 - progress, 3)));
+                if (progress < 1) requestAnimationFrame(update);
+            }
+            requestAnimationFrame(update);
+        }
+
+        // S2联合分析系数（基于样本数的规模优惠）
+        function getS2Rate(sampleNum) {
+            if (sampleNum >= 5000) return 0.03;
+            if (sampleNum >= 1000) return 0.05;
+            if (sampleNum >= 500) return 0.20;
+            if (sampleNum >= 300) return 0.50;
+            if (sampleNum >= 100) return 0.30;
+            return 0.50;
+        }
+
+        function calculate() {
+            const refSize = parseFloat(elRefSize.value) || 0;      // 基因组大小 GB
+            const sampleNum = parseFloat(elSampleNum.value) || 0;   // 样本数
+            const fqSize = parseFloat(elFqSize.value) || 0;         // 总测序数据量 GB
+
+            // 单样本测序数据量
+            const perSampleData = sampleNum > 0 ? fqSize / sampleNum : 0;
+
+            // S1: 单样本变异检测
+            // 基础单价 0.17元/GB，单样本数据量越小单价越高（固定开销分摊）
+            let s1Rate = 0.17;
+            if (perSampleData < 150) {
+                s1Rate = 0.17 + (150 - perSampleData) * 0.003;
+            }
+            const costS1 = fqSize * s1Rate;
+
+            // S2: 联合分析 = 样本数 × 基因组大小 × 系数
+            const s2Rate = getS2Rate(sampleNum);
+            const costS2 = sampleNum * refSize * s2Rate;
+
+            // 存储成本计算
+            // 总存储空间 ≈ (总测序数据量 × 1.25) / 1024 TB（含中间文件）
+            const totalStorageTB = (fqSize * 1.25) / 1024;
+            // 耗时天数 = max(2, ceil(样本数/25))
+            const days = Math.max(2, Math.ceil(sampleNum / 25));
+            // 存储成本 = 总存储空间(TB) × 耗时(天) × 1.73元/TB/天
+            const costStorage = totalStorageTB * days * 1.73;
+
+            // 总成本
+            const total = costS1 + costS2 + costStorage;
+
+            // 更新UI
+            animateNumber(elCostGvcf, costS1);
+            animateNumber(elCostCon, costS2);
+            animateNumber(elCostDisk, costStorage);
+            animateNumber(elTotalCost, total);
+
+            // 显示S2系数信息
+            if (sampleNum >= 100) {
+                elDiscountBadge.classList.remove('hidden');
+                elDiscountRow.classList.remove('hidden');
+                elDiscountRate.textContent = Math.round(s2Rate * 100);
+                elDiscountAmount.textContent = formatter.format(0);
+            } else {
+                elDiscountBadge.classList.add('hidden');
+                elDiscountRow.classList.add('hidden');
+            }
+        }
+
+        function autoCalc() {
+            const refSize = parseFloat(elRefSize.value) || 0;
+            const sampleNum = parseFloat(elSampleNum.value) || 0;
+            const deep = parseFloat(elDeep.value) || 0;
+            elFqSize.value = Math.round(refSize * sampleNum * deep);
+            calculate();
+        }
+
+        document.querySelectorAll('input[name="species"]').forEach(r => {
+            r.addEventListener('change', function() {
+                const size = speciesGenomeSize[this.value];
+                if (size) { elRefSize.value = size; autoCalc(); }
+            });
+        });
+
+        [elRefSize, elSampleNum, elDeep].forEach(i => i.addEventListener('input', autoCalc));
+        elFqSize.addEventListener('input', calculate);
+        btnRecalc.addEventListener('click', autoCalc);
+
+        function showContact() {
+            Swal.fire({
+                title: '<span class="font-bold text-lg">联系技术顾问</span>',
+                html: `
+                    <div class="text-left space-y-3 py-4">
+                        <div class="p-3 bg-slate-50 rounded-xl">
+                            <p class="text-xs text-slate-500">联系人</p>
+                            <p class="font-bold">官老师（未特生物销售经理）</p>
+                        </div>
+                        <a href="tel:13208994525" class="flex items-center gap-3 p-3 bg-indigo-50 rounded-xl">
+                            <i class="bi bi-telephone text-indigo-600"></i>
+                            <span class="font-bold">13208994525</span>
+                        </a>
+                        <a href="mailto:weiteshengwu_wheat@163.com" class="flex items-center gap-3 p-3 bg-cyan-50 rounded-xl">
+                            <i class="bi bi-envelope text-cyan-600"></i>
+                            <span class="text-sm font-medium">weiteshengwu_wheat@163.com</span>
+                        </a>
+                    </div>
+                `,
+                showCloseButton: true,
+                showConfirmButton: false,
+                customClass: { popup: 'rounded-2xl' }
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', autoCalc);
+    </script>
+</body>
+</html>

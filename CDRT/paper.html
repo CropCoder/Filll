@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>发表论文 - 作物抗病机制与技术团队 CDRT</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- SheetJS: 浏览器端读取 xlsx -->
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <style>
+    html { scroll-behavior: smooth; scrollbar-gutter: stable; }
+    body { opacity: 0; animation: fadePageIn 0.6s ease-out forwards; font-family: 'Inter', 'Noto Sans SC', sans-serif; }
+    @keyframes fadePageIn { to { opacity: 1; } }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.05s; }
+    .reveal-delay-2 { transition-delay: 0.1s; }
+    .reveal-delay-3 { transition-delay: 0.15s; }
+
+    .glass {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    .bg-grid {
+      background-image:
+        linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    .nav-link { position: relative; }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 50%;
+      width: 0;
+      height: 2px;
+      background: #166534;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      transform: translateX(-50%);
+    }
+    .nav-link:hover::after, .nav-link.active::after { width: 70%; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #f5f5f4; }
+    ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #a8a29e; }
+
+    /* 表格样式 */
+    .paper-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+    .paper-table th {
+      font-weight: 600;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #78716c;
+      padding: 0.85rem 1.25rem;
+      background: #fafaf9;
+      border-bottom: 2px solid #d6d3d1;
+      text-align: left;
+    }
+    .paper-table th.col-seq,
+    .paper-table th.col-year {
+      text-align: center;
+    }
+    .paper-table td {
+      padding: 0.9rem 1.25rem;
+      border-bottom: 1px solid #f0efed;
+      vertical-align: middle;
+      font-size: 0.9rem;
+      line-height: 1.55;
+    }
+    .paper-table td.col-seq,
+    .paper-table td.col-year {
+      text-align: center;
+    }
+    /* 序号列 */
+    .paper-table td.col-seq {
+      color: #a8a29e;
+      font-size: 0.8rem;
+      font-weight: 500;
+      width: 3rem;
+    }
+    /* 题目列自动扩展 */
+    .paper-table td.col-title {
+      color: #1c1917;
+      font-weight: 500;
+    }
+    /* 期刊列 */
+    .paper-table td.col-journal {
+      color: #57534e;
+      font-style: italic;
+      white-space: nowrap;
+    }
+    /* 年份列 */
+    .paper-table td.col-year {
+      color: #78716c;
+      font-weight: 600;
+      font-size: 0.82rem;
+      width: 4.5rem;
+    }
+    .paper-table td.col-year .year-badge {
+      display: inline-block;
+      padding: 0.2rem 0.7rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .year-2026 { background: #ecfdf5; color: #065f46; }
+    .year-2025 { background: #eff6ff; color: #1e40af; }
+    .year-2024 { background: #fef2f2; color: #991b1b; }
+
+    /* 斑马纹 */
+    .paper-table tbody tr:nth-child(even) {
+      background-color: #fafaf9;
+    }
+    .paper-table tbody tr {
+      transition: background-color 0.25s, box-shadow 0.25s;
+    }
+    .paper-table tbody tr:hover {
+      background-color: #f0fdf4;
+      box-shadow: inset 3px 0 0 #059669;
+    }
+
+    /* 响应式 */
+    @media (max-width: 768px) {
+      .paper-table th, .paper-table td { padding: 0.65rem 0.75rem; font-size: 0.8rem; }
+      .paper-table td.col-journal { white-space: normal; }
+    }
+  </style>
+</head>
+<body class="font-sans text-stone-600 bg-stone-50 antialiased">
+
+  <!-- 导航栏 -->
+  <header id="nav" class="glass fixed top-0 left-0 right-0 z-50 border-b border-stone-200/60">
+    <div class="max-w-6xl mx-auto px-5 sm:px-8 flex items-center justify-between h-16">
+      <a href="#hero" class="flex items-center gap-3 shrink-0">
+        <div class="w-9 h-9 bg-stone-900 rounded-xl flex items-center justify-center shadow-sm">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+          </svg>
+        </div>
+        <span class="text-stone-800 font-bold text-lg tracking-tight hidden sm:block">CDRT</span>
+      </a>
+      <nav class="hidden lg:flex items-center gap-1">
+        <a href="https://cdrt.filll.cn" class="nav-link px-3 py-2 text-sm font-medium text-stone-500 hover:text-stone-800 rounded-xl transition-colors">团队主页</a>
+        <a href="index.html" class="nav-link px-3 py-2 text-sm font-medium text-stone-500 hover:text-stone-800 rounded-xl transition-colors">团队成员</a>
+        <a href="recruit.html" class="nav-link px-3 py-2 text-sm font-medium text-stone-500 hover:text-stone-800 rounded-xl transition-colors">人才招聘</a>
+      </nav>
+      <button id="menuBtn" class="lg:hidden p-2 rounded-xl hover:bg-stone-100 transition-colors">
+        <svg class="w-5 h-5 text-stone-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path id="menuIconOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          <path id="menuIconClose" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" class="hidden"/>
+        </svg>
+      </button>
+    </div>
+    <div id="mobileMenu" class="lg:hidden hidden border-t border-stone-200/60 bg-white/95 backdrop-blur-md">
+      <div class="px-5 py-4 space-y-2">
+        <a href="https://cdrt.filll.cn" class="block px-4 py-2.5 text-sm font-medium text-stone-600 hover:text-stone-800 hover:bg-stone-100 rounded-xl transition-colors">团队主页</a>
+        <a href="index.html" class="block px-4 py-2.5 text-sm font-medium text-stone-600 hover:text-stone-800 hover:bg-stone-100 rounded-xl transition-colors">团队成员</a>
+        <a href="recruit.html" class="block px-4 py-2.5 text-sm font-medium text-stone-600 hover:text-stone-800 hover:bg-stone-100 rounded-xl transition-colors">人才招聘</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 首页横幅 -->
+  <section id="hero" class="relative min-h-[40vh] flex items-center pt-16 overflow-hidden">
+    <div class="absolute inset-0 bg-grid pointer-events-none"></div>
+    <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-100/50 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-stone-200/30 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="relative max-w-6xl mx-auto px-5 sm:px-8 w-full py-20">
+      <div class="text-center space-y-6 max-w-2xl mx-auto">
+        <div class="reveal">
+          <span class="inline-block px-4 py-1.5 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold rounded-full uppercase tracking-wider">Publications</span>
+        </div>
+        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-stone-900 leading-[1.15] tracking-tight reveal reveal-delay-1">
+          发表论文
+        </h1>
+        <p class="text-lg text-stone-500 leading-relaxed reveal reveal-delay-2">
+          团队近年来发表的主要学术论文成果
+        </p>
+        <div id="heroStats" class="flex flex-wrap justify-center gap-8 reveal reveal-delay-3">
+          <div class="text-center">
+            <div class="text-3xl font-bold text-stone-900 stat-number" id="statTotal">--</div>
+            <div class="text-xs text-stone-400 mt-1">论文总数</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 论文列表区 -->
+  <section class="py-16 sm:py-20 bg-white">
+    <div class="max-w-5xl mx-auto px-5 sm:px-8">
+
+      <!-- 加载状态 -->
+      <div id="loading" class="text-center py-20 reveal">
+        <div class="inline-block w-8 h-8 border-2 border-emerald-200 border-t-emerald-600 rounded-full animate-spin"></div>
+        <p class="text-sm text-stone-400 mt-4">正在加载论文数据...</p>
+      </div>
+
+      <!-- 错误提示 -->
+      <div id="error" class="hidden text-center py-20 reveal">
+        <p class="text-sm text-red-500">无法加载 paper.xlsx，请确认文件存在于项目根目录。</p>
+      </div>
+
+      <!-- 论文表格 -->
+      <div id="paperContainer" class="hidden reveal">
+        <div class="overflow-x-auto rounded-2xl border border-stone-200/80 shadow-sm">
+          <table class="paper-table w-full">
+            <thead>
+              <tr>
+                <th class="col-seq">#</th>
+                <th class="col-title">Title</th>
+                <th class="col-journal">Journal</th>
+                <th class="col-year">Year</th>
+              </tr>
+            </thead>
+            <tbody id="paperBody">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 页脚 -->
+  <footer class="bg-stone-900 text-stone-400 py-12">
+    <div class="max-w-6xl mx-auto px-5 sm:px-8">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-6 mb-8">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 bg-emerald-700 rounded-xl flex items-center justify-center">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+            </svg>
+          </div>
+          <span class="text-white font-bold text-lg tracking-tight">CDRT</span>
+        </div>
+        <div class="flex items-center gap-4">
+          <a href="index.html" class="text-sm text-stone-400 hover:text-stone-200 transition-colors">团队成员</a>
+          <a href="recruit.html" class="text-sm text-stone-400 hover:text-stone-200 transition-colors">人才招聘</a>
+          <a href="https://cdrt.filll.cn" target="_blank" rel="noopener" class="text-sm text-stone-400 hover:text-stone-200 transition-colors flex items-center gap-1">
+            团队主页
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+          </a>
+        </div>
+      </div>
+      <div class="border-t border-stone-800 pt-6 text-center">
+        <p class="text-xs">2026 作物抗病机制与技术团队 - 保留所有权利</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    !function(){
+      'use strict';
+
+      var allPapers = [];
+
+      // 加载 xlsx
+      function loadPapers() {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', './paper.xlsx', true);
+        xhr.responseType = 'arraybuffer';
+
+        xhr.onload = function(e) {
+          if (xhr.status === 200 || xhr.status === 304 || xhr.status === 0) {
+            try {
+              var data = new Uint8Array(xhr.response);
+              var workbook = XLSX.read(data, { type: 'array' });
+              var sheet = workbook.Sheets[workbook.SheetNames[0]];
+              var rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+
+              if (rows.length < 2) { showError(); return; }
+
+              allPapers = [];
+              for (var i = 1; i < rows.length; i++) {
+                var row = rows[i];
+                if (!row || !row[1]) continue;
+                allPapers.push({
+                  index:   row[0] || '',
+                  title:   row[1] || '',
+                  journal: row[2] || '',
+                  year:    parseInt(row[3]) || 0
+                });
+              }
+
+              // 按年份降序排序
+              allPapers.sort(function(a, b) {
+                if (a.year !== b.year) return b.year - a.year;
+                var ai = parseInt(a.index) || 0;
+                var bi = parseInt(b.index) || 0;
+                return ai - bi;
+              });
+
+              document.getElementById('loading').classList.add('hidden');
+              document.getElementById('paperContainer').classList.remove('hidden');
+              renderPapers();
+              observeReveal();
+            } catch(err) {
+              console.error('解析 xlsx 出错:', err);
+              showError();
+            }
+          } else {
+            showError();
+          }
+        };
+
+        xhr.onerror = function() { showError(); };
+        xhr.send();
+      }
+
+      function showError() {
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('error').classList.remove('hidden');
+      }
+
+      // 渲染表格
+      function renderPapers() {
+        var tbody = document.getElementById('paperBody');
+
+        // 更新顶部统计数字
+        document.getElementById('statTotal').textContent = allPapers.length;
+        if (allPapers.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="4" class="text-center py-12 text-stone-400">暂无论文记录</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = allPapers.map(function(p, i) {
+          var yearClass = '';
+          if (p.year === 2026) yearClass = 'year-2026';
+          else if (p.year === 2025) yearClass = 'year-2025';
+          else if (p.year === 2024) yearClass = 'year-2024';
+          return '<tr class="reveal">'
+            + '<td class="col-seq">' + (i + 1) + '</td>'
+            + '<td class="col-title">' + escapeHTML(p.title) + '</td>'
+            + '<td class="col-journal">' + escapeHTML(p.journal) + '</td>'
+            + '<td class="col-year"><span class="year-badge ' + yearClass + '">' + p.year + '</span></td>'
+            + '</tr>';
+        }).join('');
+
+        setTimeout(function() { observeReveal(); }, 50);
+      }
+
+      function escapeHTML(str) {
+        var div = document.createElement('div');
+        div.appendChild(document.createTextNode(str));
+        return div.innerHTML;
+      }
+
+      // 滚动渐入动画
+      function observeReveal() {
+        var els = document.querySelectorAll('.reveal:not(.visible)');
+        if (!els.length) return;
+        var obs = new IntersectionObserver(function(entries) {
+          entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              obs.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.05, rootMargin: '0px 0px -20px 0px' });
+        els.forEach(function(el) { obs.observe(el); });
+      }
+
+      // 移动端菜单
+      var menuOpen = false;
+      document.getElementById('menuBtn').addEventListener('click', function() {
+        menuOpen = !menuOpen;
+        var m = document.getElementById('mobileMenu');
+        var io = document.getElementById('menuIconOpen');
+        var ic = document.getElementById('menuIconClose');
+        if (menuOpen) { m.classList.remove('hidden'); io.classList.add('hidden'); ic.classList.remove('hidden'); }
+        else { m.classList.add('hidden'); io.classList.remove('hidden'); ic.classList.add('hidden'); }
+      });
+      document.querySelectorAll('#mobileMenu a').forEach(function(a) {
+        a.addEventListener('click', function() {
+          menuOpen = false;
+          document.getElementById('mobileMenu').classList.add('hidden');
+          document.getElementById('menuIconOpen').classList.remove('hidden');
+          document.getElementById('menuIconClose').classList.add('hidden');
+        });
+      });
+
+      // 导航滚动高亮
+      var sections = [];
+      document.querySelectorAll('section[id]').forEach(function(s) { sections.push(s); });
+      window.addEventListener('scroll', function() {
+        var scrollY = window.scrollY + 150;
+        sections.forEach(function(sec) {
+          if (sec.offsetTop <= scrollY && sec.offsetTop + sec.offsetHeight > scrollY) {
+            var id = sec.getAttribute('id');
+            document.querySelectorAll('.nav-link').forEach(function(l) {
+              l.classList.toggle('active', l.getAttribute('href') === '#' + id);
+            });
+          }
+        });
+      }, { passive: true });
+
+      // 启动
+      loadPapers();
+
+      var resizeTimer;
+      window.addEventListener('resize', function() {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(observeReveal, 200);
+      }, { passive: true });
+    }();
+  </script>
+</body>
+</html>

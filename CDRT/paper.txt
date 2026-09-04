@@ -1,0 +1,34 @@
+题目	期刊名称	发表年份
+Rice false smut virulence protein subverts host chitin perception and signaling at lemma and palea for floral infection.	The Plant Cell	2024
+Optimizing nutrient transporters to enhance disease resistance in rice.	Journal of Experimental Botany	2024
+A comprehensive map of DNA-segment copy number variation in 491 genomes of common wheat uncovers genes associated with multiple agronomic traits.	Plant communications	2024
+Myosin XI-mediated BIK1 recruitment to nanodomains facilitates FLS2-BIK1 complex formation during innate immunity in Arabidopsis.	PNAS	2024
+Natural variations of maize ZmLecRK1 determine its interaction with ZmBAK1 and resistance patterns to multiple pathogens.	Molecular plant	2024
+A self-assembling split Nano luciferase-based assay for investigating Pseudomonas syringae efector secretion.	Stress Biology	2024
+The OXIDATIVE SIGNAL-INDUCIBLE1 kinase regulates plant immunity by linking microbial pattern-induced reactive oxygen species burst to MAP kinase activation.	The Plant cell	2024
+Phosphorylation-dependent regulation of plant heterotrimeric G proteins: From activation to downstream signaling	Science bulletin	2024
+A widespread plant defense compound disarms bacterial type III injectisome assembly.	Science	2025
+A receptor antagonist counterbalances multiple systemin phytocytokines in tomato	Cell	2025
+A wheat tandem kinase and NLR pair confers resistance to multiple fungal pathogens.	Science	2025
+Genomic structural variation in an alpha/beta hydrolase triggers hybrid necrosis in wheat.	Nature communications	2025
+Fighting enemies in every which way.	Invited review by Annual Review of Cell and Developmental Biology	2025
+Genomics-driven discovery of superior alleles and genes for yellow rust resistance in wheat	Nat Genet	2025
+Single-cell multi-omics tell the secrets of plant immunity	Molecular cell	2025
+Solving the puzzle of salicylic acid biosynthesis in plants	Journal of Genetics and Genomics	2025
+Understanding and enhancing rice resistance to false smut disease	Journal of Genetics and Genomics	2025
+Fungal chromatin remodeler Isw1 modulates translation via regulating tRNA transcription	Nucleic Acids Research	2025
+Real-time monitoring of subcellular H2O2 dynamics by genetically encoded probe roGFP2-PRXIIB	Journal of Integrative Plant Biology	2025
+Phase separation of a master transcription factor targeted by a natural compound regulates fungal ergosterol homeostasis	Science China Life Sciences	2025
+LWRR: Landscape of Wheat Rust Resistance towards practical breeding design	Stress Biology	2025
+"An annotated near-complete sequence assembly of the Magnaporthe oryzae 70-15
+reference genome"	Scientific Data	2025
+"Population-scale gene expression analysis reveals the contribution of expression
+diversity to the modern wheat improvement"	Nature communications	2025
+Integrating plant immune mechanisms, resistance gene discovery, and engineering strategies to improve crop disease resistance	Molecular Plant	2025
+The Mgv1–Rlm1 axis orchestrates SAGA and SWI / SNF complexes at target promoters	Nucleic Acids Research	2025
+Improving rice false smut resistance by editing grain-filling-related genes	Journal of Genetics and Genomics	2025
+A regulatory network promotes apoplastic alkalinization to prime plant immunity in tissues distal to site of infection	Cell	2026
+New alleles of Arabidopsis BIK1 reinforce its predominant role in pattern-triggered immunity and caution interpretations of other reported functions	Nature Plants	2026
+A fungal two-in-one trick	Nature Plants	2026
+A seedling-stage expression quantitative trait locus atlas across tissues and genetic backgrounds in wheat	Genomics Communications	2026
+The wheat Yr6 locus, allelic to Pm5, harbors an NLR gene pair conferring stripe rust resistance	Plant communications	2026

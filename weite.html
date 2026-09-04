@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>群体重测序变异检测 | 未特生物 WeiteBio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script type="importmap">
+        { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'Noto Sans SC', 'sans-serif'] },
+                    colors: {
+                        brand: { 50:'#f0fdfa',100:'#ccfbf1',200:'#99f6e4',300:'#5eead4',400:'#2dd4bf',500:'#14b8a6',600:'#0d9488',700:'#0f766e',800:'#115e59',900:'#134e4a' },
+                        accent: { 400:'#818cf8',500:'#6366f1',600:'#4f46e5',700:'#4338ca' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { scroll-behavior: smooth; }
+        body { font-family: 'Inter', 'Noto Sans SC', sans-serif; background: #ffffff; }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #0d9488 0%, #6366f1 50%, #a855f7 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .gradient-text-warm {
+            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 50%, #ec4899 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .hero-bg {
+            background: linear-gradient(180deg, #f0fdfa 0%, #eef2ff 50%, #ffffff 100%);
+        }
+
+        .glass { background: rgba(255,255,255,0.9); backdrop-filter: blur(20px); border: 1px solid #e2e8f0; }
+        .card { background: #ffffff; border: 1px solid #e2e8f0; transition: all 0.4s ease; border-radius: 16px; }
+        .card:hover { border-color: #14b8a6; transform: translateY(-4px); box-shadow: 0 20px 60px -20px rgba(20,184,166,0.15); }
+
+        .pricing-card-featured {
+            background: linear-gradient(180deg, #f0fdfa, #ffffff);
+            border: 2px solid #14b8a6;
+            position: relative; border-radius: 16px;
+        }
+        .pricing-card-featured::before {
+            content: '推荐'; position: absolute; top: 16px; right: -2px;
+            background: linear-gradient(135deg, #0d9488, #6366f1);
+            color: white; font-size: 12px; font-weight: 700; padding: 6px 20px;
+            border-radius: 6px 0 0 6px; letter-spacing: 1px;
+        }
+
+        .input-glow { transition: all 0.2s; }
+        .input-glow:focus { box-shadow: 0 0 0 3px rgba(20,184,166,0.15); border-color: #14b8a6; }
+        .btn-primary { background: linear-gradient(135deg, #0d9488, #6366f1); transition: all 0.3s; color: white; }
+        .btn-primary:hover { box-shadow: 0 0 30px rgba(20,184,166,0.25); transform: translateY(-1px); }
+
+        @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+
+        .species-btn:checked + .species-label { border-color: #14b8a6; background: #f0fdfa; }
+        .species-label { cursor: pointer; transition: all 0.3s; border: 2px solid #e2e8f0; }
+        .species-label:hover { border-color: #5eead4; }
+
+        /* Radio-inside-label selection highlight */
+        .tier-radio:checked + div {  }
+        label:has(.species-btn:checked) { border-color: #14b8a6 !important; background: #f0fdfa !important; }
+
+        input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .tier-badge { letter-spacing: 2px; font-size: 11px; }
+    </style>
+</head>
+<body class="text-slate-700 antialiased">
+
+<!-- ====== NAV ====== -->
+<nav class="fixed top-0 left-0 right-0 z-50 glass border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+        <span class="font-bold text-xl text-slate-900">未特生物 <span class="text-slate-400 font-normal text-sm ml-1">WeiteBio</span></span>
+        <div class="hidden md:flex items-center gap-8 text-sm">
+            <a href="#advantages" class="text-slate-500 hover:text-brand-600 transition-colors">核心优势</a>
+            <a href="#pricing" class="text-slate-500 hover:text-brand-600 transition-colors">产品方案</a>
+            <a href="#calculator" class="text-slate-500 hover:text-brand-600 transition-colors">报价计算器</a>
+        </div>
+        <a href="#contact" class="btn-primary text-white text-sm font-semibold px-5 py-2.5 rounded-xl hidden md:block">获取报价</a>
+    </div>
+</nav>
+
+<!-- ====== HERO ====== -->
+<section class="hero-bg min-h-screen flex items-center relative overflow-hidden pt-16">
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-10 right-10 w-96 h-96 bg-brand-300/20 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-20 left-10 w-80 h-80 bg-accent-400/15 rounded-full blur-3xl"></div>
+    </div>
+    <div class="max-w-7xl mx-auto px-6 w-full relative z-10 py-20">
+        <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
+            <!-- Left: Text -->
+            <div class="flex-1 max-w-xl">
+                <div class="inline-flex items-center gap-2 bg-white/80 border border-slate-200 px-4 py-2 rounded-full text-sm mb-8 shadow-sm">
+                    <span class="w-2 h-2 bg-brand-500 rounded-full animate-pulse"></span>
+                    <span class="text-brand-600 font-medium">企业级生信分析技术服务</span>
+                </div>
+                <h1 class="text-5xl sm:text-6xl lg:text-7xl font-black text-slate-900 leading-tight mb-6">
+                    群体重测序<br>
+                    <span class="gradient-text">变异检测</span>
+                </h1>
+                <p class="text-xl text-slate-500 mb-10 leading-relaxed">
+                    上万核心 HPC 集群 · GATK 金标准流程 · <span class="text-slate-800 font-semibold">学术级交付</span><br>
+                    让复杂计算回归简单，您只管提出问题
+                </p>
+                <div class="flex flex-wrap gap-4">
+                    <a href="#calculator" class="btn-primary font-semibold px-8 py-4 rounded-xl text-lg inline-flex items-center gap-2">
+                        开始计算报价 <i class="bi bi-arrow-right"></i>
+                    </a>
+                    <a href="#pricing" class="bg-white border-2 border-slate-200 text-slate-700 font-semibold px-8 py-4 rounded-xl text-lg inline-flex items-center gap-2 hover:border-brand-500 hover:text-brand-600 transition-all">
+                        查看产品方案 <i class="bi bi-grid"></i>
+                    </a>
+                </div>
+                <div class="flex flex-wrap gap-10 mt-16">
+                    <div><div class="text-3xl font-bold text-slate-900">10,000+</div><div class="text-sm text-slate-400 mt-1">CPU 核心算力</div></div>
+                    <div><div class="text-3xl font-bold text-slate-900">数天</div><div class="text-sm text-slate-400 mt-1">极速交付周期</div></div>
+                    <div><div class="text-3xl font-bold text-slate-900">7×24</div><div class="text-sm text-slate-400 mt-1">技术售后支持</div></div>
+                </div>
+            </div>
+            <!-- Right: Globe -->
+            <div class="flex-shrink-0 w-80 h-80 sm:w-96 sm:h-96 lg:w-[520px] lg:h-[520px] relative" id="globe-container">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ====== ADVANTAGES ====== -->
+<section id="advantages" class="py-24 bg-white">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="text-center mb-16">
+            <span class="text-brand-600 text-sm font-semibold tracking-widest uppercase tier-badge">Why WeiteBio</span>
+            <h2 class="text-4xl font-bold text-slate-900 mt-4 mb-4">为什么选择我们</h2>
+            <p class="text-slate-500 max-w-xl mx-auto">自研并行框架 × 企业级 HPC × 金标准流程，重新定义重测序分析效率</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="card p-8 text-center rounded-2xl">
+                <div class="w-14 h-14 mx-auto mb-5 rounded-2xl bg-brand-50 flex items-center justify-center">
+                    <i class="bi bi-cpu text-brand-600 text-2xl"></i>
+                </div>
+                <h3 class="font-bold text-slate-900 text-lg mb-3">海量算力</h3>
+                <p class="text-slate-500 text-sm leading-relaxed">10,000+ CPU核心高性能集群，从容应对数千样本级别的大规模群体分析</p>
+            </div>
+            <div class="card p-8 text-center rounded-2xl">
+                <div class="w-14 h-14 mx-auto mb-5 rounded-2xl bg-indigo-50 flex items-center justify-center">
+                    <i class="bi bi-lightning-charge text-accent-500 text-2xl"></i>
+                </div>
+                <h3 class="font-bold text-slate-900 text-lg mb-3">极速交付</h3>
+                <p class="text-slate-500 text-sm leading-relaxed">自研并行调度框架，数月计算压缩至数天完成，不牺牲分析质量</p>
+            </div>
+            <div class="card p-8 text-center rounded-2xl">
+                <div class="w-14 h-14 mx-auto mb-5 rounded-2xl bg-emerald-50 flex items-center justify-center">
+                    <i class="bi bi-shield-check text-emerald-600 text-2xl"></i>
+                </div>
+                <h3 class="font-bold text-slate-900 text-lg mb-3">金标准流程</h3>
+                <p class="text-slate-500 text-sm leading-relaxed">GATK Best Practices 标准流程，每一步可追溯，结果科学可重复</p>
+            </div>
+            <div class="card p-8 text-center rounded-2xl">
+                <div class="w-14 h-14 mx-auto mb-5 rounded-2xl bg-amber-50 flex items-center justify-center">
+                    <i class="bi bi-globe2 text-amber-600 text-2xl"></i>
+                </div>
+                <h3 class="font-bold text-slate-900 text-lg mb-3">多物种覆盖</h3>
+                <p class="text-slate-500 text-sm leading-relaxed">水稻·小麦·玉米·大豆·棉花·油菜·林木，作物全覆盖</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ====== PRODUCT TIERS ====== -->
+<section id="pricing" class="py-24 bg-white border-t border-slate-100">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="text-center mb-16">
+            <span class="text-brand-600 text-sm font-semibold tracking-widest uppercase tier-badge">Pricing</span>
+            <h2 class="text-4xl font-bold text-slate-900 mt-4 mb-4">产品方案</h2>
+            <p class="text-slate-500 max-w-xl mx-auto">从标准变异检测到定制化深度分析，满足不同层次科研需求</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <!-- Basic -->
+            <div class="card p-8 flex flex-col rounded-2xl">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900 mb-1">基础版</h3>
+                    <p class="text-slate-400 text-sm mb-6">经济实惠的标准交付</p>
+                    <div class="mb-6">
+                        <span class="text-4xl font-black text-slate-900">¥40</span>
+                        <span class="text-slate-400 text-sm ml-1">起/样本</span>
+                    </div>
+                </div>
+                <ul class="space-y-3 text-sm flex-1 mb-8">
+                    <li class="flex items-start gap-2"><i class="bi bi-check-lg text-brand-500 mt-0.5"></i><span class="text-slate-600">VCF 标准变异文件</span></li>
+                    <li class="flex items-start gap-2"><i class="bi bi-check-lg text-brand-500 mt-0.5"></i><span class="text-slate-600">基础数据质控报告</span></li>
+                    <li class="flex items-start gap-2"><i class="bi bi-check-lg text-brand-500 mt-0.5"></i><span class="text-slate-600">7天标准交付周期</span></li>
+                    <li class="flex items-start gap-2 text-slate-300"><i class="bi bi-dash mt-0.5"></i><span>—</span></li>
+                </ul>
+                <a href="#calculator" class="block text-center border-2 border-slate-200 text-slate-600 font-semibold py-3 rounded-xl hover:border-brand-500 hover:text-brand-600 transition-all text-sm">计算价格</a>
+            </div>
+
+            <!-- Standard (Featured) -->
+            <div class="pricing-card-featured p-8 flex flex-col rounded-2xl">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <h3 class="text-lg font-bold text-slate-900">标准版</h3>
+                        <span class="bg-brand-100 text-brand-700 text-xs px-2 py-0.5 rounded-full tier-badge font-semibold">热门</span>
+                    </div>
+                    <p class="text-slate-500 text-sm mb-6">适合常规科研发表</p>
+                    <div class="mb-6">
+                        <span class="text-4xl font-black text-slate-900">¥52</span>
+                        <span class="text-slate-400 text-sm ml-1">起/样本</span>
+                    </div>
+                </div>
+                <ul class="space-y-3 text-sm flex-1 mb-8">
+                    <li class="flex items-start gap-2"><i class="bi bi-check-lg text-brand-500 mt-0.5"></i><span class="text-slate-600">基础版全部内容</span></li>
+                    <li class="flex items-start gap-2"><i class="bi bi-check-lg text-brand-500 mt-0.5"></i><span class="text-slate-600">CRAM 压缩格式交付</span></li>
+                    <li class="flex items-start gap-2"><i class="bi bi-check-lg text-brand-500 mt-0.5"></i><span class="text-slate-600">详细质控报告 + PCA 图</span></li>
+                    <li class="flex items-start gap-2"><i class="bi bi-check-lg text-brand-500 mt-0.5"></i><span class="text-slate-600">5天快速交付</span></li>
+                </ul>
+                <a href="#calculator" class="btn-primary text-center font-semibold py-3 rounded-xl text-sm block">计算价格</a>
+            </div>
+
+            <!-- Pro -->
+            <div class="card p-8 flex flex-col rounded-2xl">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900 mb-1">高级版</h3>
+                    <p class="text-slate-400 text-sm mb-6">冲击高分文章首选</p>
+                    <div class="mb-6">
+                        <span class="text-4xl font-black text-slate-900">¥64</span>
+                        <span class="text-slate-400 text-sm ml-1">起/样本</span>
+                    </div>
+                </div>
+                <ul class="space-y-3 text-sm flex-1 mb-8">
+                    <li class="flex items-start gap-2"><i class="bi bi-check-lg text-accent-500 mt-0.5"></i><span class="text-slate-600">标准版全部内容</span></li>
+                    <li class="flex items-start gap-2"><i class="bi bi-check-lg text-accent-500 mt-0.5"></i><span class="text-slate-600">GWAS-ready 格式输出</span></li>
+                    <li class="flex items-start gap-2"><i class="bi bi-check-lg text-accent-500 mt-0.5"></i><span class="text-slate-600">群体结构 + 选择清除分析</span></li>
+                    <li class="flex items-start gap-2"><i class="bi bi-check-lg text-accent-500 mt-0.5"></i><span class="text-slate-600">3天优先交付</span></li>
+                </ul>
+                <a href="#calculator" class="block text-center border-2 border-slate-200 text-slate-600 font-semibold py-3 rounded-xl hover:border-accent-500 hover:text-accent-600 transition-all text-sm">计算价格</a>
+            </div>
+
+            <!-- Enterprise -->
+            <div class="card p-8 flex flex-col rounded-2xl">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900 mb-1">旗舰版</h3>
+                    <p class="text-slate-400 text-sm mb-6">VIP 全流程定制</p>
+                    <div class="mb-6">
+                        <span class="text-4xl font-black gradient-text-warm">定制</span>
+                    </div>
+                </div>
+                <ul class="space-y-3 text-sm flex-1 mb-8">
+                    <li class="flex items-start gap-2"><i class="bi bi-star-fill text-amber-500 mt-0.5"></i><span class="text-slate-600">高级版全部内容</span></li>
+                    <li class="flex items-start gap-2"><i class="bi bi-star-fill text-amber-500 mt-0.5"></i><span class="text-slate-600">1v1 专属生信顾问</span></li>
+                    <li class="flex items-start gap-2"><i class="bi bi-star-fill text-amber-500 mt-0.5"></i><span class="text-slate-600">定制化下游分析</span></li>
+                    <li class="flex items-start gap-2"><i class="bi bi-star-fill text-amber-500 mt-0.5"></i><span class="text-slate-600">无限次售后修改</span></li>
+                </ul>
+                <a href="#contact" class="block text-center border-2 border-amber-300 text-amber-600 font-semibold py-3 rounded-xl hover:bg-amber-50 transition-all text-sm">联系我们</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ====== CALCULATOR ====== -->
+<section id="calculator" class="py-24 bg-slate-50 border-t border-slate-100">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="text-center mb-16">
+            <span class="text-brand-600 text-sm font-semibold tracking-widest uppercase tier-badge">Enterprise Quote</span>
+            <h2 class="text-4xl font-bold text-slate-900 mt-4 mb-4">企业级精准报价</h2>
+            <p class="text-slate-500">透明计价 · 规模优惠 · 学术级交付</p>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+            <!-- Left: Input -->
+            <div class="lg:col-span-3 space-y-6">
+                <!-- Species & Scale -->
+                <div class="bg-white rounded-2xl p-8 border border-slate-200 shadow-sm">
+                    <h3 class="font-bold text-slate-900 text-lg mb-6 flex items-center gap-2"><i class="bi bi-database text-brand-600"></i>项目规模</h3>
+                    <div class="mb-6">
+                        <label class="text-sm text-slate-500 mb-3 block">物种类型</label>
+                        <div class="grid grid-cols-4 gap-3">
+                            <label><input type="radio" name="species" value="wheat" class="species-btn sr-only" checked><span class="species-label block p-3 text-center rounded-xl"><span class="text-xl">🌾</span><span class="block text-xs text-slate-600 mt-1">小麦</span></span></label>
+                            <label><input type="radio" name="species" value="rice" class="species-btn sr-only"><span class="species-label block p-3 text-center rounded-xl"><span class="text-xl">🍚</span><span class="block text-xs text-slate-600 mt-1">水稻</span></span></label>
+                            <label><input type="radio" name="species" value="maize" class="species-btn sr-only"><span class="species-label block p-3 text-center rounded-xl"><span class="text-xl">🌽</span><span class="block text-xs text-slate-600 mt-1">玉米</span></span></label>
+                            <label><input type="radio" name="species" value="soybean" class="species-btn sr-only"><span class="species-label block p-3 text-center rounded-xl"><span class="text-xl">🫘</span><span class="block text-xs text-slate-600 mt-1">大豆</span></span></label>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-4 mb-4">
+                        <div><label class="text-sm text-slate-500 mb-2 block">基因组大小</label><div class="relative"><input type="number" id="refSize" value="15" step="0.1" class="input-glow w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 outline-none"><span class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">Gb</span></div></div>
+                        <div><label class="text-sm text-slate-500 mb-2 block">样本数量</label><input type="number" id="sampleNum" value="447" class="input-glow w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 outline-none"></div>
+                        <div><label class="text-sm text-slate-500 mb-2 block">测序深度</label><div class="relative"><input type="number" id="deep" value="12" class="input-glow w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 outline-none"><span class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">×</span></div></div>
+                    </div>
+                    <div class="p-5 rounded-xl bg-gradient-to-r from-brand-50 to-indigo-50 border border-brand-100">
+                        <div class="flex items-center justify-between mb-2"><label class="text-sm text-brand-700 font-medium">预估测序数据量 (fq.gz)</label><button id="recalc" class="text-xs text-brand-600 hover:text-brand-800 font-medium"><i class="bi bi-arrow-clockwise mr-1"></i>重算</button></div>
+                        <div class="relative"><input type="number" id="fqSize" value="80460" class="w-full px-4 py-3 bg-white border border-brand-200 rounded-xl font-bold text-slate-900 outline-none"><span class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-brand-600 font-medium">GB</span></div>
+                    </div>
+                </div>
+
+                <!-- Product & SLA -->
+                <div class="bg-white rounded-2xl p-8 border border-slate-200 shadow-sm">
+                    <h3 class="font-bold text-slate-900 text-lg mb-6 flex items-center gap-2"><i class="bi bi-stars text-brand-600"></i>产品与交付</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Product Tier -->
+                        <div>
+                            <label class="text-sm text-slate-500 mb-3 block">产品方案</label>
+                            <div class="space-y-2">
+                                <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer hover:border-brand-300 transition-colors" id="tier-basic"><input type="radio" name="tier" value="basic" class="species-btn sr-only"><div><span class="text-sm font-semibold text-slate-800">基础版</span><span class="text-xs text-slate-400 ml-2">VCF + 基础QC</span></div></label>
+                                <label class="flex items-center gap-3 p-3 border-2 rounded-xl cursor-pointer hover:border-brand-300 transition-colors" id="tier-standard"><input type="radio" name="tier" value="standard" class="species-btn sr-only" checked><div><span class="text-sm font-semibold text-slate-800">标准版</span><span class="text-xs text-slate-400 ml-2">+CRAM + PCA + 详细QC</span><span class="ml-1 bg-brand-100 text-brand-700 text-[10px] px-1.5 py-0.5 rounded-full font-semibold">推荐</span></div></label>
+                                <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer hover:border-accent-300 transition-colors" id="tier-pro"><input type="radio" name="tier" value="pro" class="species-btn sr-only"><div><span class="text-sm font-semibold text-slate-800">高级版</span><span class="text-xs text-slate-400 ml-2">+GWAS-ready + 群体分析</span></div></label>
+                                <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer hover:border-amber-300 transition-colors" id="tier-enterprise"><input type="radio" name="tier" value="enterprise" class="species-btn sr-only"><div><span class="text-sm font-semibold text-slate-800">旗舰版</span><span class="text-xs text-slate-400 ml-2">1v1顾问 + 定制分析</span></div></label>
+                            </div>
+                        </div>
+                        <!-- SLA -->
+                        <div>
+                            <label class="text-sm text-slate-500 mb-3 block">交付周期</label>
+                            <div class="space-y-2">
+                                <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer hover:border-brand-300 transition-colors"><input type="radio" name="sla" value="standard" class="species-btn sr-only" checked><div class="flex justify-between w-full"><span class="text-sm font-semibold text-slate-800">标准</span><span class="text-xs text-slate-400">7 工作日</span></div></label>
+                                <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer hover:border-brand-300 transition-colors"><input type="radio" name="sla" value="priority" class="species-btn sr-only"><div class="flex justify-between w-full"><span class="text-sm font-semibold text-slate-800">优先</span><span class="text-xs text-slate-400">5 工作日 · <span class="text-brand-600 font-medium">+20%</span></span></div></label>
+                                <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer hover:border-brand-300 transition-colors"><input type="radio" name="sla" value="express" class="species-btn sr-only"><div class="flex justify-between w-full"><span class="text-sm font-semibold text-slate-800">加急</span><span class="text-xs text-slate-400">3 工作日 · <span class="text-accent-600 font-medium">+40%</span></span></div></label>
+                            </div>
+                            <label class="text-sm text-slate-500 mt-5 mb-2 block">数据留存期</label>
+                            <select id="retention" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 outline-none input-glow text-sm">
+                                <option value="30">30 天（默认）</option>
+                                <option value="90">90 天</option>
+                                <option value="180">180 天</option>
+                                <option value="365">1 年</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Quote Card -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-2xl overflow-hidden sticky top-24 border border-slate-200 shadow-lg">
+                    <div class="bg-gradient-to-r from-slate-800 to-slate-900 p-6">
+                        <div class="flex items-center justify-between mb-1"><span class="text-slate-400 text-xs uppercase tracking-wider font-semibold">Estimated Total</span><span class="text-slate-500 text-[10px]">CNY</span></div>
+                        <div class="flex items-baseline gap-1"><span class="text-2xl text-brand-400 font-light">¥</span><span id="totalCost" class="text-5xl font-black text-white">0</span></div>
+                        <div class="flex gap-2 mt-3 flex-wrap">
+                            <span id="badge-volume" class="hidden inline-flex items-center bg-brand-500/20 text-brand-300 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">规模优惠</span>
+                            <span id="badge-sla" class="inline-flex items-center bg-slate-500/20 text-slate-400 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">标准交付</span>
+                        </div>
+                    </div>
+                    <div class="p-5 space-y-1">
+                        <!-- S1 -->
+                        <div class="flex justify-between items-center py-3 border-b border-slate-50">
+                            <div><span class="text-sm font-semibold text-slate-700">S1 · 变异检测</span><p class="text-[11px] text-slate-400 mt-0.5"><span id="info-samples">447</span> 样本 × <span id="info-depth">12</span>× · <span id="info-s1rate">0.22</span> 元/GB</p></div>
+                            <span class="text-sm font-bold text-slate-800">¥<span id="costS1">0</span></span>
+                        </div>
+                        <!-- S2 -->
+                        <div class="flex justify-between items-center py-3 border-b border-slate-50">
+                            <div><span class="text-sm font-semibold text-slate-700">S2 · 联合分析</span><p class="text-[11px] text-slate-400 mt-0.5"><span id="info-genome">15</span>Gb 基因组 · 系数 <span id="s2RateDisplay">0.35</span></p></div>
+                            <span class="text-sm font-bold text-slate-800">¥<span id="costS2">0</span></span>
+                        </div>
+                        <!-- Storage -->
+                        <div class="flex justify-between items-center py-3 border-b border-slate-50">
+                            <div><span class="text-sm font-semibold text-slate-700">存储</span><p class="text-[11px] text-slate-400 mt-0.5"><span id="info-tb">0</span> TB · <span id="info-days">0</span> 天 · 1.73 元/TB/天</p></div>
+                            <span class="text-sm font-bold text-slate-800">¥<span id="costDisk">0</span></span>
+                        </div>
+                        <!-- Product Tier -->
+                        <div class="flex justify-between items-center py-3 border-b border-slate-50">
+                            <div><span class="text-sm font-semibold text-slate-700">产品升级</span><p class="text-[11px] text-slate-400 mt-0.5"><span id="info-tier">标准版</span> · 系数 ×<span id="info-tierMult">1.3</span></p></div>
+                            <span class="text-sm font-bold text-brand-600">+¥<span id="costTier">0</span></span>
+                        </div>
+                        <!-- SLA surcharge -->
+                        <div id="row-sla" class="hidden flex justify-between items-center py-3 border-b border-slate-50">
+                            <div><span class="text-sm font-semibold text-slate-700">加急交付</span><p class="text-[11px] text-slate-400 mt-0.5">SLA 溢价 <span id="info-slaPct">0</span>%</p></div>
+                            <span class="text-sm font-bold text-amber-600">+¥<span id="costSLA">0</span></span>
+                        </div>
+                        <!-- Volume discount -->
+                        <div id="row-discount" class="hidden flex justify-between items-center py-3 bg-brand-50 -mx-5 px-5">
+                            <span class="text-sm font-semibold text-brand-700">规模优惠</span>
+                            <span class="text-sm font-bold text-brand-600">−¥<span id="costDiscount">0</span></span>
+                        </div>
+                    </div>
+                    <div class="p-5 bg-slate-50 space-y-2">
+                        <div class="flex justify-between text-xs text-slate-400"><span>每样本均价</span><span>¥<span id="perSample">0</span></span></div>
+                        <div class="flex justify-between text-xs text-slate-400"><span>每 GB 数据成本</span><span>¥<span id="perGB">0</span></span></div>
+                    </div>
+                    <div class="p-5 pt-0 bg-slate-50">
+                        <button onclick="document.getElementById('contact').scrollIntoView()" class="btn-primary w-full py-3.5 font-semibold rounded-xl">获取正式报价</button>
+                        <p class="text-center text-xs text-slate-400 mt-3">报价含税 · 最终以合同为准</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ====== CONTACT ====== -->
+<section id="contact" class="py-24 bg-gradient-to-b from-slate-50 to-white border-t border-slate-100">
+    <div class="max-w-2xl mx-auto px-6">
+        <div class="text-center mb-12">
+            <span class="text-brand-600 text-sm font-semibold tracking-widest uppercase tier-badge">Contact</span>
+            <h2 class="text-4xl font-bold text-slate-900 mt-4 mb-4">开始您的项目</h2>
+            <p class="text-slate-500">专业团队 24 小时内响应，提供定制化方案评估</p>
+        </div>
+
+        <div class="relative overflow-hidden rounded-3xl" style="background: rgba(255,255,255,0.6); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid rgba(20,184,166,0.15); box-shadow: 0 8px 32px rgba(20,184,166,0.06);">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-brand-400/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4"></div>
+            <div class="absolute bottom-0 left-0 w-48 h-48 bg-accent-400/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/4"></div>
+            <div class="relative p-8 md:p-12">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Left: Preparation -->
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-lg mb-5 flex items-center gap-2"><span class="w-8 h-8 rounded-lg bg-brand-100 flex items-center justify-center text-brand-600 text-sm">📋</span>咨询前请准备</h3>
+                        <ul class="space-y-4">
+                            <li class="flex items-center gap-3 text-sm text-slate-600"><span class="w-6 h-6 rounded-full bg-brand-50 flex items-center justify-center text-brand-600 text-xs font-bold flex-shrink-0">1</span>物种名称与参考基因组版本</li>
+                            <li class="flex items-center gap-3 text-sm text-slate-600"><span class="w-6 h-6 rounded-full bg-brand-50 flex items-center justify-center text-brand-600 text-xs font-bold flex-shrink-0">2</span>样本数量与测序深度</li>
+                            <li class="flex items-center gap-3 text-sm text-slate-600"><span class="w-6 h-6 rounded-full bg-brand-50 flex items-center justify-center text-brand-600 text-xs font-bold flex-shrink-0">3</span>原始数据量或预估体积</li>
+                            <li class="flex items-center gap-3 text-sm text-slate-600"><span class="w-6 h-6 rounded-full bg-brand-50 flex items-center justify-center text-brand-600 text-xs font-bold flex-shrink-0">4</span>期望交付周期与分析深度</li>
+                        </ul>
+                    </div>
+                    <!-- Right: Contact -->
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-lg mb-5 flex items-center gap-2"><span class="w-8 h-8 rounded-lg bg-brand-100 flex items-center justify-center text-brand-600 text-sm">📞</span>联系方式</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-3 p-3 rounded-xl bg-white/60">
+                                <div class="w-10 h-10 rounded-xl bg-brand-50 flex items-center justify-center flex-shrink-0"><i class="bi bi-person-fill text-brand-600"></i></div>
+                                <div><p class="text-xs text-slate-400">联系人</p><p class="text-sm font-semibold text-slate-800">官老师（销售经理）</p></div>
+                            </div>
+                            <a href="tel:13208994525" class="flex items-center gap-3 p-3 rounded-xl bg-white/60 hover:bg-brand-50/50 transition-colors group">
+                                <div class="w-10 h-10 rounded-xl bg-brand-50 flex items-center justify-center flex-shrink-0 group-hover:bg-brand-100 transition-colors"><i class="bi bi-telephone-fill text-brand-600"></i></div>
+                                <div><p class="text-xs text-slate-400">电话</p><p class="text-sm font-semibold text-slate-800">132 0899 4525</p></div>
+                            </a>
+                            <a href="mailto:weiteshengwu_wheat@163.com" class="flex items-center gap-3 p-3 rounded-xl bg-white/60 hover:bg-brand-50/50 transition-colors group">
+                                <div class="w-10 h-10 rounded-xl bg-brand-50 flex items-center justify-center flex-shrink-0 group-hover:bg-brand-100 transition-colors"><i class="bi bi-envelope-fill text-brand-600"></i></div>
+                                <div><p class="text-xs text-slate-400">邮箱</p><p class="text-sm text-slate-700">weiteshengwu_wheat@163.com</p></div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ====== FOOTER ====== -->
+<footer class="bg-slate-900 py-12">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+        <span class="font-bold text-xl text-white">未特生物 <span class="text-slate-500 font-normal text-sm">WeiteBio</span></span>
+        <div class="flex gap-6 text-sm text-slate-400">
+            <span>水稻</span><span>小麦</span><span>玉米</span><span>大豆</span><span>棉花</span><span>林木</span>
+        </div>
+        <p class="text-sm text-slate-500">&copy; 2025 WeiteBio. All rights reserved.</p>
+    </div>
+</footer>
+
+<!-- ====== SCRIPT ====== -->
+<script>
+const elRefSize = document.getElementById('refSize');
+const elSampleNum = document.getElementById('sampleNum');
+const elDeep = document.getElementById('deep');
+const elFqSize = document.getElementById('fqSize');
+const elCostS1 = document.getElementById('costS1');
+const elCostS2 = document.getElementById('costS2');
+const elCostDisk = document.getElementById('costDisk');
+const elCostTier = document.getElementById('costTier');
+const elCostSLA = document.getElementById('costSLA');
+const elCostDiscount = document.getElementById('costDiscount');
+const elTotalCost = document.getElementById('totalCost');
+
+const speciesGenome = { wheat:15, rice:0.43, maize:2.1, soybean:1.1 };
+const fmt = new Intl.NumberFormat('zh-CN');
+
+function anim(el, target) {
+    const start = parseFloat(el.textContent.replace(/,/g,''))||0;
+    const dur = 300, t0 = performance.now();
+    function up(t) {
+        const p = Math.min((t-t0)/dur,1);
+        el.textContent = fmt.format(start+(target-start)*(1-Math.pow(1-p,3)));
+        if(p<1) requestAnimationFrame(up);
+    }
+    requestAnimationFrame(up);
+}
+
+function getS2Rate(n) {
+    if(n>=5000) return 0.04;
+    if(n>=1000) return 0.07;
+    if(n>=500)  return 0.15;
+    if(n>=300)  return 0.22;
+    if(n>=100)  return 0.35;
+    if(n>=50)   return 0.50;
+    return 0.80;
+}
+
+function compute() {
+    const ref = parseFloat(elRefSize.value)||0;
+    const n = parseFloat(elSampleNum.value)||0;
+    const fq = parseFloat(elFqSize.value)||0;
+    const perSample = n>0 ? fq/n : 0;
+
+    // -- S1: Variant Calling --
+    const S1_BASE = 0.22;
+    let s1r = S1_BASE;
+    if(perSample < 100) s1r += (100-perSample)*0.005;  // small-sample penalty
+    const s1Base = fq * s1r;
+
+    // -- S2: Joint Genotyping --
+    const s2r = getS2Rate(n);
+    const s2Base = n * ref * s2r;
+
+    // -- Storage --
+    const tb = (fq*1.25)/1024;
+    const baseDays = Math.max(2, Math.ceil(n/25));
+    const retentionDays = parseInt(document.getElementById('retention').value)||30;
+    const diskBase = tb * Math.max(baseDays, retentionDays) * 1.73;
+
+    // -- Product Tier multiplier (on S1+S2 only) --
+    const tierMap = { basic:1.0, standard:1.3, pro:1.6, enterprise:2.0 };
+    const tierVal = document.querySelector('input[name="tier"]:checked')?.value || 'standard';
+    const tierMult = tierMap[tierVal] || 1.3;
+    const tierNames = { basic:'基础版', standard:'标准版', pro:'高级版', enterprise:'旗舰版' };
+    const tierSurcharge = (s1Base + s2Base) * (tierMult - 1);
+
+    // -- SLA surcharge --
+    const slaMap = { standard:0, priority:0.20, express:0.40 };
+    const slaNames = { standard:'标准交付', priority:'优先交付', express:'加急交付' };
+    const slaVal = document.querySelector('input[name="sla"]:checked')?.value || 'standard';
+    const slaPct = slaMap[slaVal];
+    const slaSurcharge = slaPct > 0 ? (s1Base + s2Base) * tierMult * slaPct : 0;
+
+    // -- Volume discount (on base S1+S2) --
+    let discountPct = 0;
+    if(n >= 5000) discountPct = 0.15;
+    else if(n >= 1000) discountPct = 0.10;
+    else if(n >= 500) discountPct = 0.05;
+    else if(n >= 300) discountPct = 0.03;
+    const discountAmt = (s1Base + s2Base) * discountPct;
+
+    // -- Totals --
+    const s1Final = s1Base * tierMult;
+    const s2Final = s2Base * tierMult;
+    const subTotal = s1Final + s2Final + diskBase + tierSurcharge + slaSurcharge - discountAmt;
+    const total = Math.max(subTotal, 2000);
+
+    // Animate
+    anim(elCostS1, s1Final);
+    anim(elCostS2, s2Final);
+    anim(elCostDisk, diskBase);
+    anim(elCostTier, tierSurcharge);
+    anim(elCostSLA, slaSurcharge);
+    anim(elCostDiscount, discountAmt);
+    anim(elTotalCost, total);
+
+    // Per-sample & per-GB
+    document.getElementById('perSample').textContent = fmt.format(total/n);
+    document.getElementById('perGB').textContent = (total/fq).toFixed(3);
+
+    // Info labels
+    document.getElementById('info-samples').textContent = n;
+    document.getElementById('info-depth').textContent = (perSample/ref).toFixed(0);
+    document.getElementById('info-s1rate').textContent = s1r.toFixed(2);
+    document.getElementById('info-genome').textContent = ref;
+    document.getElementById('s2RateDisplay').textContent = s2r.toFixed(2);
+    document.getElementById('info-tb').textContent = tb.toFixed(1);
+    document.getElementById('info-days').textContent = Math.max(baseDays, retentionDays);
+    document.getElementById('info-tier').textContent = tierNames[tierVal];
+    document.getElementById('info-tierMult').textContent = tierMult;
+
+    // Badges
+    document.getElementById('badge-volume').classList.toggle('hidden', discountPct===0);
+    document.getElementById('badge-sla').textContent = slaNames[slaVal];
+
+    // SLA row
+    document.getElementById('row-sla').classList.toggle('hidden', slaPct===0);
+    document.getElementById('info-slaPct').textContent = Math.round(slaPct*100);
+
+    // Discount row
+    document.getElementById('row-discount').classList.toggle('hidden', discountPct===0);
+}
+
+function autoFq() {
+    const ref = parseFloat(elRefSize.value)||0;
+    const n = parseFloat(elSampleNum.value)||0;
+    const d = parseFloat(elDeep.value)||0;
+    elFqSize.value = Math.round(ref*n*d);
+    compute();
+}
+
+document.querySelectorAll('input[name="species"]').forEach(r=>{
+    r.addEventListener('change', function(){
+        const s = speciesGenome[this.value];
+        if(s) { elRefSize.value = s; autoFq(); }
+    });
+});
+[elRefSize, elSampleNum, elDeep].forEach(e=>e.addEventListener('input', autoFq));
+elFqSize.addEventListener('input', compute);
+document.getElementById('recalc').addEventListener('click', autoFq);
+document.querySelectorAll('input[name="tier"]').forEach(r=>r.addEventListener('change', compute));
+document.querySelectorAll('input[name="sla"]').forEach(r=>r.addEventListener('change', compute));
+document.getElementById('retention').addEventListener('change', compute);
+window.addEventListener('DOMContentLoaded', autoFq);
+</script>
+
+<!-- ====== THREE.JS GLOBE V2 ====== -->
+<script type="module">
+import * as THREE from 'three';
+
+const container = document.getElementById('globe-container');
+
+// Create canvas
+const canvas = document.createElement('canvas');
+canvas.style.width = '100%'; canvas.style.height = '100%';
+container.appendChild(canvas);
+
+let W = container.clientWidth, H = container.clientHeight;
+const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+renderer.setSize(W, H);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(40, W/H, 0.1, 100);
+camera.position.set(0, 0, 5.5);
+
+// Mouse tracking
+const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
+container.addEventListener('mousemove', e => {
+    const r = container.getBoundingClientRect();
+    mouse.tx = ((e.clientX - r.left) / r.width - 0.5) * 2;
+    mouse.ty = -((e.clientY - r.top) / r.height - 0.5) * 2;
+});
+container.addEventListener('mouseleave', () => { mouse.tx = 0; mouse.ty = 0; });
+
+// -- Background glow sphere --
+const bgGeo = new THREE.SphereGeometry(1.85, 64, 64);
+const bgMat = new THREE.ShaderMaterial({
+    vertexShader: `varying vec3 vNormal; varying vec3 vPosition; void main() { vNormal = normalize(normalMatrix*normal); vec4 p = modelViewMatrix*vec4(position,1.0); vPosition = p.xyz; gl_Position = projectionMatrix*p; }`,
+    fragmentShader: `varying vec3 vNormal; varying vec3 vPosition; void main() { vec3 d = normalize(-vPosition); float i = pow(0.65-abs(dot(vNormal,d)),4.0); gl_FragColor = vec4(0.18,0.78,0.70,i*0.35); }`,
+    transparent: true, blending: THREE.AdditiveBlending, depthWrite: false
+});
+const bgGlow = new THREE.Mesh(bgGeo, bgMat);
+scene.add(bgGlow);
+
+// -- Outer glow ring --
+const ringGlowGeo = new THREE.TorusGeometry(1.95, 0.04, 32, 120);
+const ringGlowMat = new THREE.ShaderMaterial({
+    vertexShader: `varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+    fragmentShader: `varying vec2 vUv; void main() { float a = smoothstep(0.0,0.4,vUv.x)*smoothstep(1.0,0.6,vUv.x); gl_FragColor = vec4(0.18,0.78,0.70,a*0.45); }`,
+    transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide
+});
+const ringGlow = new THREE.Mesh(ringGlowGeo, ringGlowMat);
+ringGlow.rotation.x = Math.PI/2.4;
+scene.add(ringGlow);
+
+// -- Main globe (frosted glass) --
+const globeGroup = new THREE.Group();
+const globeGeo = new THREE.SphereGeometry(1.55, 100, 100);
+
+// Frosted glass material using shader
+const globeMat = new THREE.ShaderMaterial({
+    uniforms: { uTime: { value: 0 } },
+    vertexShader: `varying vec3 vNormal; varying vec3 vWorldPos; varying vec2 vUv; void main() { vec4 wp = modelMatrix*vec4(position,1.0); vWorldPos = wp.xyz; vNormal = normalize(mat3(modelMatrix)*normal); vec4 mv = modelViewMatrix*vec4(position,1.0); gl_Position = projectionMatrix*mv; }`,
+    fragmentShader: `varying vec3 vNormal; varying vec3 vWorldPos; uniform float uTime; void main() { vec3 view = normalize(cameraPosition-vWorldPos); float fresnel = pow(1.0-abs(dot(vNormal,view)),3.0); vec3 base = mix(vec3(0.06,0.22,0.30),vec3(0.12,0.55,0.65),fresnel*0.7); float alpha = 0.55+fresnel*0.35; gl_FragColor = vec4(base,alpha); }`,
+    transparent: true, depthWrite: true
+});
+const globeMesh = new THREE.Mesh(globeGeo, globeMat);
+globeGroup.add(globeMesh);
+
+// -- Grid lines (wireframe overlay) --
+const wireGeo = new THREE.SphereGeometry(1.555, 40, 60);
+const wireMat = new THREE.MeshBasicMaterial({ color: 0x14b8a6, wireframe: true, transparent: true, opacity: 0.06, depthWrite: false });
+const wireframe = new THREE.Mesh(wireGeo, wireMat);
+globeGroup.add(wireframe);
+
+// -- Binary streams (0s and 1s floating on surface) --
+const binGroup = new THREE.Group();
+const binCanvas = document.createElement('canvas');
+binCanvas.width = 512; binCanvas.height = 64;
+const ctx = binCanvas.getContext('2d');
+ctx.fillStyle = '#14b8a6'; ctx.font = 'bold 28px Inter,monospace';
+const chars = [];
+for (let i = 0; i < 40; i++) {
+    ctx.clearRect(0, 0, 512, 64);
+    const len = 6 + Math.floor(Math.random()*8);
+    let str = '';
+    for (let j = 0; j < len; j++) str += Math.random()>0.5 ? '0':'1';
+    ctx.fillText(str, 0, 40);
+    const tex = new THREE.CanvasTexture(binCanvas);
+    tex.minFilter = THREE.LinearFilter;
+    const spriteMat = new THREE.SpriteMaterial({ map: tex, transparent: true, opacity: 0.5+Math.random()*0.4, blending: THREE.AdditiveBlending, depthWrite: false });
+    const sprite = new THREE.Sprite(spriteMat);
+    const lat = (Math.random()-0.5)*Math.PI*0.85;
+    const lon = Math.random()*Math.PI*2;
+    const r = 1.57;
+    sprite.position.set(r*Math.cos(lat)*Math.cos(lon), r*Math.sin(lat), r*Math.cos(lat)*Math.sin(lon));
+    sprite.scale.set(0.45, 0.06, 1);
+    sprite.userData = { lat, lon, speed: 0.1+Math.random()*0.4, baseLat: lat };
+    chars.push(sprite);
+    binGroup.add(sprite);
+}
+globeGroup.add(binGroup);
+scene.add(globeGroup);
+
+// -- Continent dot clusters (dense, detailed) --
+const dotsGroup = new THREE.Group();
+const dotGeo = new THREE.SphereGeometry(0.014, 5, 5);
+const dotMat = new THREE.MeshBasicMaterial({ color: 0x5eead4, transparent: true, opacity: 0.85 });
+const landPoints = [];
+function addCluster(lat, lon, spread, count) {
+    for (let i=0;i<count;i++) {
+        const la=(lat+(Math.random()-0.5)*spread)*Math.PI/180;
+        const lo=(lon+(Math.random()-0.5)*spread*1.6)*Math.PI/180;
+        landPoints.push([la,lo]);
+    }
+}
+addCluster(48,-100,28,100); addCluster(58,-120,18,50); // NA
+addCluster(-15,-58,22,70); addCluster(-35,-68,16,35); // SA
+addCluster(52,12,22,80); addCluster(60,28,14,35); // EU
+addCluster(8,22,28,90); addCluster(-18,28,20,50); // AF
+addCluster(42,92,32,120); addCluster(56,105,22,60); addCluster(28,82,16,45); // AS
+addCluster(8,112,16,40); addCluster(-22,138,18,35); // SE/OC
+addCluster(24,78,10,25); addCluster(32,48,12,20); addCluster(50,68,14,30); // IN+ME+CA
+landPoints.forEach(([la,lo])=>{
+    const r=1.575,x=r*Math.cos(la)*Math.cos(lo),y=r*Math.sin(la),z=r*Math.cos(la)*Math.sin(lo);
+    const dot=new THREE.Mesh(dotGeo,dotMat); dot.position.set(x,y,z); dotsGroup.add(dot);
+});
+globeGroup.add(dotsGroup);
+
+// -- Orbital rings --
+function createRing(radius,tiltX,tiltY,color,opacity){
+    const g=new THREE.TorusGeometry(radius,0.006,16,140);
+    const m=new THREE.MeshBasicMaterial({color,transparent:true,opacity,depthWrite:false,blending:THREE.AdditiveBlending});
+    const r=new THREE.Mesh(g,m); r.rotation.x=tiltX; r.rotation.y=tiltY; return r;
+}
+const rings=[
+    createRing(2.15,Math.PI/2.4,0.3,0x2dd4bf,0.3),
+    createRing(2.4,Math.PI/2.1,-0.2,0x6366f1,0.22),
+    createRing(2.65,Math.PI/1.7,0.5,0x2dd4bf,0.14)
+];
+rings.forEach(r=>scene.add(r));
+
+// -- Floating particles --
+const parts=new THREE.Group();
+const pGeo=new THREE.SphereGeometry(0.02,4,4);
+for(let i=0;i<60;i++){
+    const m=new THREE.MeshBasicMaterial({color:i%3===0?0x2dd4bf:0x818cf8,transparent:true,opacity:0.6+Math.random()*0.4,depthWrite:false,blending:THREE.AdditiveBlending});
+    const p=new THREE.Mesh(pGeo,m);
+    const a=Math.random()*Math.PI*2,rad=2.2+Math.random()*0.7;
+    p.position.set(Math.cos(a)*rad,(Math.random()-0.5)*3.5,Math.sin(a)*rad);
+    p.userData={speed:0.15+Math.random()*0.4,radius:rad,angle:a,yBase:p.position.y};
+    parts.add(p);
+}
+scene.add(parts);
+
+// -- Lights --
+scene.add(new THREE.AmbientLight(0x304060,0.7));
+const l1=new THREE.DirectionalLight(0x2dd4bf,2.0); l1.position.set(5,3,5); scene.add(l1);
+const l2=new THREE.DirectionalLight(0x6366f1,1.2); l2.position.set(-5,-2,-3); scene.add(l2);
+
+// -- Animation --
+const clock=new THREE.Clock();
+function animate(){
+    requestAnimationFrame(animate);
+    const t=clock.getElapsedTime();
+
+    // Smooth mouse follow
+    mouse.x+=(mouse.tx-mouse.x)*0.04;
+    mouse.y+=(mouse.ty-mouse.y)*0.04;
+    globeGroup.rotation.y+=0.003+mouse.x*0.015;
+    globeGroup.rotation.x=mouse.y*0.3;
+    bgGlow.rotation.copy(globeGroup.rotation);
+    ringGlow.rotation.copy(globeGroup.rotation);
+
+    // Auto rotation overlay (subtle)
+    globeGroup.rotation.y+=0.0015;
+
+    // Rings
+    rings[0].rotation.z+=0.0008; rings[1].rotation.z-=0.0006; rings[2].rotation.z+=0.0004;
+
+    // Particles
+    parts.children.forEach(p=>{
+        p.userData.angle+=p.userData.speed*0.008;
+        const a=p.userData.angle;
+        p.position.x=Math.cos(a)*p.userData.radius;
+        p.position.z=Math.sin(a)*p.userData.radius;
+        p.position.y=p.userData.yBase+Math.sin(t*0.7+a)*0.25;
+    });
+
+    // Binary stream movement (slide lat)
+    chars.forEach(c=>{
+        c.userData.lat+=c.userData.speed*0.003;
+        if(c.userData.lat>Math.PI*0.42) c.userData.lat=-Math.PI*0.42;
+        const la=c.userData.lat, lo=c.userData.lon;
+        const r=1.57;
+        c.position.set(r*Math.cos(la)*Math.cos(lo),r*Math.sin(la),r*Math.cos(la)*Math.sin(lo));
+        c.material.opacity=0.3+0.3*Math.sin(t*2+c.userData.lat*3);
+        c.scale.set(0.4+Math.sin(t+c.userData.lon)*0.08,0.055,1);
+    });
+
+    // Shader time
+    globeMat.uniforms.uTime.value=t;
+
+    // Atmosphere pulse
+    bgGlow.scale.setScalar(1+Math.sin(t*1.2)*0.02);
+
+    renderer.render(scene,camera);
+}
+animate();
+
+window.addEventListener('resize',()=>{
+    W=container.clientWidth; H=container.clientHeight;
+    renderer.setSize(W,H); camera.aspect=W/H; camera.updateProjectionMatrix();
+});
+</script>
+</body>
+</html>

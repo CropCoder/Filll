@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>飞荔科学 | Filll Science Studio</title>
+    <link rel="shortcut icon" href="https://www.filll.cn/upload/logo.png">
+    <!-- 引入 Google Fonts (Inter) 以获得类似的现代无衬线字体风格 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- 配置自定义颜色和字体 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        // Arc 风格偏向这种冷淡且略带暖意的灰色
+                        'arc-dark': '#1a1a1a',
+                        'arc-gray': '#888888',
+                        'arc-light': '#f9f9f9',
+                        'arc-border': '#e5e5e5',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* 自定义一些细微的动画 */
+        .fade-in-up {
+            animation: fadeInUp 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 模仿 Arc 的链接下划线效果 */
+        .hover-underline-animation {
+            display: inline-block;
+            position: relative;
+        }
+
+        .hover-underline-animation::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            transform: scaleX(0);
+            height: 1px;
+            bottom: 0;
+            left: 0;
+            background-color: #1a1a1a;
+            transform-origin: bottom right;
+            transition: transform 0.25s ease-out;
+        }
+
+        .hover-underline-animation:hover::after {
+            transform: scaleX(1);
+            transform-origin: bottom left;
+        }
+    </style>
+</head>
+
+<body class="font-sans text-arc-dark bg-white antialiased selection:bg-stone-200 selection:text-black">
+
+    <!-- 导航栏 (Sticky Top) -->
+    <header class="fixed w-full top-0 z-50 bg-white/90 backdrop-blur-sm border-b border-arc-border">
+        <div class="max-w-[1440px] mx-auto px-6 h-16 flex items-center justify-between">
+            <!-- Logo -->
+            <a href="#" class="text-xl font-semibold tracking-tight flex items-center gap-2">
+                <div class="w-4 h-4 bg-stone-800 rounded-full"></div>
+                飞荔科学 ｜ Filll Studio
+            </a>
+
+            <!-- Nav Links -->
+            <nav class="hidden md:flex gap-8 text-sm font-medium text-stone-600">
+                <a href="https://filll.cn/" target="_blank" class="hover:text-black transition-colors">Home</a>
+                <a href="https://www.filll.cn/" target="_blank" class="hover:text-black transition-colors">Blog</a>
+                <!-- <a href="https://filll.cn/iPCR" target="_blank" class="hover:text-black transition-colors">iPCR</a>
+                <a href="https://filll.cn/Plot/" target="_blank" class="hover:text-black transition-colors">OnlinePlot</a> -->
+                <a href="tools/ANOVA" target="_blank" class="hover:text-black transition-colors">Tools</a>
+                <a href="tools/merge_fa" target="_blank" class="hover:text-black transition-colors">MergeFa</a>
+                <a href="tools/GetKmer" target="_blank" class="hover:text-black transition-colors">GetKmer</a>
+                <a href="tools/MutiCompare" target="_blank" class="hover:text-black transition-colors">MutiCompare</a>
+                <a href="WheatTools/GeneID" target="_blank" class="hover:text-black transition-colors">WheatGeneID</a>
+                <a href="http://10.33.34.55:3455/" target="_blank" class="hover:text-black transition-colors">CDRT</a>
+                
+            </nav>
+
+            <!-- Mobile Menu Button (Visual only) -->
+            <button class="md:hidden text-stone-800">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 9h16.5m-16.5 6.75h16.5" />
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- 主内容区域 -->
+    <main class="pt-16">
+
+        <!-- Hero Section: 视频背景版 -->
+        <!-- 1. 在 section 加上 relative 和 overflow-hidden，限制视频不跑出去 -->
+        <section class="relative w-full border-b border-arc-border overflow-hidden">
+
+            <!-- === 视频背景层 === -->
+            <!-- autoplay:自动播放 loop:循环 muted:静音(浏览器限制必须静音才能自动播) playsinline:手机端内联播放 -->
+            <video autoplay loop muted playsinline class="absolute inset-0 w-full h-full object-cover z-0">
+                <!-- 请将下面的 'your-video.mp4' 换成你实际的视频文件名 -->
+                <source src="Protein.mp4" type="video/mp4">
+            </video>
+
+            <!-- === 遮罩层 (关键) === -->
+            <!-- 使用 bg-white/90 (90%不透明度的白色) 让视频隐约可见，保证文字清晰 -->
+            <!-- 如果想要视频更清楚，可以把 90 改成 50 或 70 -->
+            <div class="absolute inset-0 bg-white/10 z-0"></div>
+
+            <!-- === 内容层 === -->
+            <!-- 加上 relative 和 z-10，确保文字浮在视频和遮罩上面 -->
+            <div class="relative z-10 max-w-[1440px] mx-auto px-6 py-24 md:py-32">
+                <div class="max-w-4xl fade-in-up">
+                    <h1
+                        class="text-4xl md:text-6xl lg:text-7xl font-medium leading-[1.1] tracking-tight mb-8 text-stone-900">
+                        迈向未来<br>
+                        <span class="text-stone-400">定制化科技创新工具链</span>
+                    </h1>
+                    <p class="text-xl md:text-2xl text-stone-500 font-light max-w-2xl leading-relaxed">
+                        Filll Studio 致力于构建全新的科研协作模式。我们将生物学、数据科学与人工智能技术深度融合，旨在解开复杂科学谜题。
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Mission Statement: 左右布局 -->
+        <section class="max-w-[1440px] mx-auto border-b border-arc-border">
+            <div class="grid grid-cols-1 md:grid-cols-12 min-h-[600px]">
+                <!-- 左侧：标题 -->
+                <div class="md:col-span-4 p-6 md:p-12 border-b md:border-b-0 md:border-r border-arc-border bg-stone-50">
+                    <span class="uppercase text-xs font-semibold tracking-widest text-stone-500 mb-4 block">我们的愿景</span>
+                    <h2 class="text-3xl font-medium mb-6">打破学科壁垒，<br>重塑发现流程。</h2>
+                    <a href="login.html"
+                        class="text-sm font-medium border-b border-stone-300 pb-0.5 hover:border-black transition-colors inline-block mt-4">现在即刻开始使用
+                        &rarr;</a>
+                    <img class = "h-auto w-auto" src="image.png" href="Image Description">
+                    
+
+                </div>
+
+                <!-- 右侧：详细内容 -->
+                <div class="md:col-span-8 p-6 md:p-12 flex flex-col justify-center">
+                    <div class="grid gap-12 md:grid-cols-2">
+                        <div>
+                            <h3 class="text-lg font-semibold mb-3">长期主义研究</h3>
+                            <p class="text-stone-600 leading-relaxed text-sm">
+                                我们摆脱了传统短期资助的限制，让科学家能够专注于高风险、高回报的基础研究，探索未知的生物学领域。
+                            </p>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold mb-3">技术驱动平台</h3>
+                            <p class="text-stone-600 leading-relaxed text-sm">
+                                内部开发的先进基因编辑与计算平台，为研究人员提供了前所未有的工具，以原子级的精度理解生命机制。
+                            </p>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold mb-3">开放科学协作</h3>
+                            <p class="text-stone-600 leading-relaxed text-sm">
+                                我们相信知识应当共享。所有的研究成果、数据和工具都将尽可能开源，以加速全球科学界的进步。
+                            </p>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold mb-3">跨学科团队</h3>
+                            <p class="text-stone-600 leading-relaxed text-sm">
+                                我们的实验室里，生物学家与机器学习工程师并肩工作，共同定义问题并寻找解决方案。
+                            </p>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold mb-3">开放科学协作</h3>
+                            <p class="text-stone-600 leading-relaxed text-sm">
+                                我们相信知识应当共享。所有的研究成果、数据和工具都将尽可能开源，以加速全球科学界的进步。
+                            </p>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold mb-3">跨学科团队</h3>
+                            <p class="text-stone-600 leading-relaxed text-sm">
+                                我们的实验室里，生物学家与机器学习工程师并肩工作，共同定义问题并寻找解决方案。
+                            </p>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold mb-3">开放科学协作</h3>
+                            <p class="text-stone-600 leading-relaxed text-sm">
+                                我们相信知识应当共享。所有的研究成果、数据和工具都将尽可能开源，以加速全球科学界的进步。
+                            </p>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold mb-3">跨学科团队</h3>
+                            <p class="text-stone-600 leading-relaxed text-sm">
+                                我们的实验室里，生物学家与机器学习工程师并肩工作，共同定义问题并寻找解决方案。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Research Areas: 模仿 Arc 的网格卡片风格 -->
+        <section class="max-w-[1440px] mx-auto border-b border-arc-border">
+            <div class="p-6 md:p-12">
+                <div class="flex justify-between items-end mb-12">
+                    <h2 class="text-3xl md:text-4xl font-medium">项目案例</h2>
+                    <a href="#" class="hidden md:block text-sm text-stone-500 hover:text-black">查看所有出版物</a>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 border-t border-l border-arc-border">
+                    <!-- Card 1 -->
+                    <div
+                        class="group border-r border-b border-arc-border p-8 hover:bg-stone-50 transition-colors cursor-pointer h-80 flex flex-col justify-between">
+                        <div>
+                            <span class="text-xs font-mono text-stone-400 mb-2 block">01</span>
+                            <h3 class="text-xl font-medium group-hover:text-stone-600 transition-colors">植物免疫通路</h3>
+                            
+                        </div>
+                        <div
+                            class="w-8 h-8 rounded-full border border-stone-200 flex items-center justify-center group-hover:bg-stone-200 transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div
+                        class="group border-r border-b border-arc-border p-8 hover:bg-stone-50 transition-colors cursor-pointer h-80 flex flex-col justify-between">
+                        <div>
+                            <span class="text-xs font-mono text-stone-400 mb-2 block">02</span>
+                            <h3 class="text-xl font-medium group-hover:text-stone-600 transition-colors">基因组工程与修复</h3>
+                        </div>
+                        <div
+                            class="w-8 h-8 rounded-full border border-stone-200 flex items-center justify-center group-hover:bg-stone-200 transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div
+                        class="group border-r border-b border-arc-border p-8 hover:bg-stone-50 transition-colors cursor-pointer h-80 flex flex-col justify-between">
+                        <div>
+                            <span class="text-xs font-mono text-stone-400 mb-2 block">03</span>
+                            <h3 class="text-xl font-medium group-hover:text-stone-600 transition-colors">AI 辅助蛋白质设计</h3>
+                        </div>
+                        <div
+                            class="w-8 h-8 rounded-full border border-stone-200 flex items-center justify-center group-hover:bg-stone-200 transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Card 4 -->
+                    <div
+                        class="group border-r border-b border-arc-border p-8 hover:bg-stone-50 transition-colors cursor-pointer h-80 flex flex-col justify-between">
+                        <div>
+                            <span class="text-xs font-mono text-stone-400 mb-2 block">03</span>
+                            <h3 class="text-xl font-medium group-hover:text-stone-600 transition-colors">AI 辅助蛋白质设计</h3>
+                        </div>
+                        <div
+                            class="w-8 h-8 rounded-full border border-stone-200 flex items-center justify-center group-hover:bg-stone-200 transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        
+
+
+
+        <!-- Team Preview -->
+        <section class="max-w-[1440px] mx-auto px-6 md:px-12 py-24">
+            <h2 class="text-3xl font-medium mb-12">开发者团队</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+                <!-- Team Member 1 -->
+                <div class="group">
+                    <div
+                        class="aspect-[4/5] bg-stone-200 mb-4 overflow-hidden relative grayscale group-hover:grayscale-0 transition-all duration-500">
+                        <!-- 这里放置图片，目前用占位色块 -->
+                        <div class="w-full h-full bg-gradient-to-br from-stone-300 to-stone-400"></div>
+                    </div>
+                    <h3 class="font-medium text-lg">Jewel</h3>
+                    <p class="text-stone-500 text-sm mt-1">创始人 & 独立开发者</p>
+                </div>
+                <!-- Team Member 2 -->
+                <div class="group">
+                    <div
+                        class="aspect-[4/5] bg-stone-200 mb-4 overflow-hidden relative grayscale group-hover:grayscale-0 transition-all duration-500">
+                        <div class="w-full h-full bg-gradient-to-br from-stone-300 to-stone-400"></div>
+                    </div>
+                    <h3 class="font-medium text-lg">James Carter</h3>
+                    <p class="text-stone-500 text-sm mt-1">云计算事业部CTO</p>
+                </div>
+                <!-- Team Member 3 -->
+                <div class="group">
+                    <div
+                        class="aspect-[4/5] bg-stone-200 mb-4 overflow-hidden relative grayscale group-hover:grayscale-0 transition-all duration-500">
+                        <div class="w-full h-full bg-gradient-to-br from-stone-300 to-stone-400"></div>
+                    </div>
+                    <h3 class="font-medium text-lg">Dr. Sarah Chen</h3>
+                    <p class="text-stone-500 text-sm mt-1">基因组学研究员</p>
+                </div>
+                <!-- Team Member 4 -->
+                <div class="group">
+                    <div
+                        class="aspect-[4/5] bg-stone-200 mb-4 overflow-hidden relative grayscale group-hover:grayscale-0 transition-all duration-500">
+                        <div class="w-full h-full bg-gradient-to-br from-stone-300 to-stone-400"></div>
+                    </div>
+                    <h3 class="font-medium text-lg">David Kim</h3>
+                    <p class="text-stone-500 text-sm mt-1">平台工程师</p>
+                </div>
+
+
+            </div>
+
+
+
+        </section>
+
+        <section class="relative w-full border-b border-arc-border overflow-hidden">
+
+            <!-- === 视频背景层 === -->
+            <!-- autoplay:自动播放 loop:循环 muted:静音(浏览器限制必须静音才能自动播) playsinline:手机端内联播放 -->
+            <video autoplay loop muted playsinline class="absolute inset-0 w-full h-full object-cover z-0">
+                <!-- 请将下面的 'your-video.mp4' 换成你实际的视频文件名 -->
+                <source src="Protein2.mp4" type="video/mp4">
+            </video>
+        </section>
+
+
+
+    </main>
+
+
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-arc-border pt-16 pb-8">
+        <div class="max-w-[1440px] mx-auto px-6 md:px-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+                <div class="col-span-1 md:col-span-2">
+                    <a href="#" class="text-xl font-semibold tracking-tight flex items-center gap-2 mb-6">
+                        <div class="w-4 h-4 bg-stone-800 rounded-full"></div>
+                        Filll Studio
+                    </a>
+                    <p class="text-stone-500 max-w-sm text-sm leading-relaxed">
+                        Filll Studio 致力于通过前沿技术推动科学研究的发展。
+                        我们相信开放协作与创新技术的结合能够解锁生命科学的新篇章。
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4 text-sm uppercase tracking-wider text-stone-400">快捷链接</h4>
+                    <ul class="space-y-3 text-sm">
+                        <li><a href="#" class="hover-underline-animation">关于我们</a></li>
+                        <li><a href="#" class="hover-underline-animation">科学研究</a></li>
+                        <li><a href="#" class="hover-underline-animation">招聘公告</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4 text-sm uppercase tracking-wider text-stone-400">联系我们</h4>
+                    <ul class="space-y-3 text-sm text-stone-600">
+                        <li>Email: admin@filll.cn</li>
+                        <li>Wechat:18049157871</li>
+                        <li>微信公众号：生信分析笔记</li>
+                    </ul>
+                </div>
+            </div>
+            <div
+                class="border-t border-arc-border pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-stone-400">
+                <p>&copy; 2025 Filll , Inc. All rights reserved.</p>
+                <div class="flex gap-6 mt-4 md:mt-0">
+                    <a href="#" class="hover:text-stone-600">Privacy Policy</a>
+                    <a href="https://beian.miit.gov.cn/" class="hover:text-stone-600">陕ICP备2023016374号-1</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 获取元素
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+
+        // 添加点击事件监听
+        btn.addEventListener('click', () => {
+            // 切换 hidden 类：如果有就去掉（显示），如果没有就加上（隐藏）
+            menu.classList.toggle('hidden');
+        });
+    </script>
+
+</body>
+
+</html>

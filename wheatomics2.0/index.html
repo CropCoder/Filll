@@ -1,0 +1,1269 @@
+<!doctype html>
+<!--
+  文件功能：WheatOmics 2.0 新版首页，依据升级版视觉设计稿实现。
+  作者：Jiwen Zhao (https://github.com/CropCoder)
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="WheatOmics 2.0 integrates wheat genomes, transcriptomes, variants and other multi-omics resources for wheat functional genomics and breeding.">
+  <title>WheatOmics 2.0 | Wheat Multi-omics Platform</title>
+  <style>
+    /* ==================== 视觉变量与基础样式 ==================== */
+    :root {
+      --forest: #07583d;
+      --forest-deep: #033f2d;
+      --leaf: #118653;
+      --sprout: #77b941;
+      --wheat: #e6b94a;
+      --mist: #f3f8f4;
+      --ink: #163128;
+      --muted: #66766e;
+      --line: #dfe9e2;
+      --white: #ffffff;
+      --shadow: 0 12px 36px rgba(8, 69, 47, 0.09);
+      --display: "Avenir Next", "Segoe UI", Arial, sans-serif;
+      --body: Arial, Helvetica, sans-serif;
+      --utility: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+      --page: min(1400px, calc(100% - 48px));
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: #fff;
+      font-family: var(--body);
+      font-size: 16px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body.nav-open { overflow: hidden; }
+
+    a { color: inherit; text-decoration: none; }
+    button, input { font: inherit; }
+    button { color: inherit; }
+    svg { display: block; }
+
+    a:focus-visible,
+    button:focus-visible,
+    input:focus-visible {
+      outline: 3px solid rgba(230, 185, 74, 0.65);
+      outline-offset: 3px;
+    }
+
+    .skip-link {
+      position: fixed;
+      z-index: 1000;
+      top: 12px;
+      left: 12px;
+      padding: 10px 14px;
+      color: var(--white);
+      background: var(--forest-deep);
+      border-radius: 8px;
+      transform: translateY(-160%);
+      transition: transform 180ms ease;
+    }
+
+    .skip-link:focus { transform: translateY(0); }
+
+    .container {
+      width: var(--page);
+      margin-inline: auto;
+    }
+
+    .icon {
+      width: 24px;
+      height: 24px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.7;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* ==================== 英雄区与导航 ==================== */
+    .hero {
+      position: relative;
+      min-height: 720px;
+      overflow: hidden;
+      isolation: isolate;
+      background: #fff;
+    }
+
+    /* 背景图容器：宽度与页面主体一致，水平居中，内部做 Ken Burns 动态缩放平移 */
+    .hero-bg {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: var(--page);
+      z-index: -2;
+      overflow: hidden;
+    }
+
+    .hero-bg::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: url("home.png");
+      background-position: center;
+      background-size: cover;
+      animation: hero-kenburns 26s ease-in-out infinite alternate;
+    }
+
+    @keyframes hero-kenburns {
+      0%   { transform: scale(1.02) translate(0, 0); }
+      50%  { transform: scale(1.12) translate(-1.5%, -1%); }
+      100% { transform: scale(1.06) translate(1.5%, 1%); }
+    }
+
+    .site-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 200;
+      border-bottom: 1px solid rgba(7, 88, 61, 0.10);
+      background: #fff;
+    }
+
+    .header-row {
+      min-height: 88px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 34px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-mark { height: 40px; width: auto; flex: none; }
+
+    .brand-name {
+      display: block;
+      color: var(--forest);
+      font-family: var(--display);
+      font-size: 21px;
+      font-weight: 750;
+      letter-spacing: -0.7px;
+      line-height: 1.05;
+    }
+
+    .brand-name em {
+      color: #21a552;
+      font-style: normal;
+    }
+
+    .brand-tagline {
+      display: block;
+      margin-top: 5px;
+      color: #65736c;
+      font-size: 9px;
+      letter-spacing: 0.03em;
+      line-height: 1.3;
+    }
+
+    .main-nav {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 25px;
+    }
+
+    .nav-item { position: relative; }
+
+    .nav-link,
+    .nav-trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      min-height: 42px;
+      border: 0;
+      padding: 0;
+      color: #243e34;
+      background: transparent;
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .nav-link::after,
+    .nav-trigger::after {
+      content: "";
+      position: absolute;
+      right: 50%;
+      bottom: 0;
+      left: 50%;
+      height: 2px;
+      border-radius: 2px;
+      background: var(--leaf);
+      transition: inset 180ms ease;
+    }
+
+    .nav-link:hover::after,
+    .nav-link.active::after,
+    .nav-trigger:hover::after { right: 0; left: 0; }
+
+    .nav-chevron {
+      width: 12px;
+      height: 12px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+    }
+
+    .dropdown {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: -18px;
+      min-width: 210px;
+      margin: 0;
+      border: 1px solid rgba(7,88,61,0.12);
+      padding: 9px;
+      list-style: none;
+      background: rgba(255,255,255,0.98);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-6px);
+      transition: 160ms ease;
+    }
+
+    .nav-item:hover .dropdown,
+    .nav-item:focus-within .dropdown {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .dropdown a {
+      display: block;
+      padding: 9px 10px;
+      border-radius: 8px;
+      color: #355147;
+      font-size: 13px;
+    }
+
+    .dropdown a:hover { color: var(--forest); background: var(--mist); }
+
+    .header-actions { display: flex; align-items: center; gap: 10px; }
+
+    .header-search {
+      position: relative;
+      width: 240px;
+    }
+
+    .header-search input {
+      width: 100%;
+      height: 38px;
+      border: 1px solid rgba(7,88,61,0.15);
+      padding: 0 42px 0 15px;
+      color: var(--ink);
+      background: rgba(255,255,255,0.9);
+      border-radius: 999px;
+      font-size: 12px;
+    }
+
+    .header-search button {
+      position: absolute;
+      top: 50%;
+      right: 6px;
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border: 0;
+      padding: 0;
+      color: var(--forest);
+      background: transparent;
+      border-radius: 50%;
+      cursor: pointer;
+      transform: translateY(-50%);
+    }
+
+    .header-search .icon { width: 16px; height: 16px; }
+
+    .contact-button,
+    .primary-button,
+    .secondary-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      min-height: 42px;
+      border: 1px solid transparent;
+      padding: 0 18px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      transition: transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+    }
+
+    .contact-button,
+    .primary-button {
+      color: var(--white);
+      background: var(--forest);
+      box-shadow: 0 8px 20px rgba(7,88,61,0.18);
+    }
+
+    .contact-button:hover,
+    .primary-button:hover {
+      background: #087249;
+      box-shadow: 0 10px 24px rgba(7,88,61,0.25);
+      transform: translateY(-2px);
+    }
+
+    .contact-button { min-height: 38px; padding-inline: 16px; font-size: 12px; }
+
+    .secondary-button {
+      color: var(--forest);
+      border-color: rgba(7,88,61,0.18);
+      background: rgba(255,255,255,0.87);
+    }
+
+    .secondary-button:hover { background: var(--white); transform: translateY(-2px); }
+
+    .button-arrow { font-size: 16px; line-height: 1; }
+
+    .menu-toggle {
+      position: relative;
+      display: none;
+      width: 42px;
+      height: 42px;
+      place-items: center;
+      border: 1px solid rgba(7,88,61,0.16);
+      padding: 0;
+      background: rgba(255,255,255,0.8);
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .menu-toggle span,
+    .menu-toggle::before,
+    .menu-toggle::after {
+      content: "";
+      position: absolute;
+      left: 11px;
+      display: block;
+      width: 18px;
+      height: 2px;
+      background: var(--forest);
+      border-radius: 3px;
+      transition: 180ms ease;
+    }
+
+    .menu-toggle::before { top: 14px; }
+    .menu-toggle span { top: 20px; }
+    .menu-toggle::after { top: 26px; }
+
+    .hero-inner {
+      min-height: 632px;
+      display: flex;
+      align-items: center;
+      padding-block: 146px 50px;
+    }
+
+    .hero-copy { position: relative; z-index: 3; max-width: 620px; padding-left: 32px; text-align: left; }
+
+    .hero h1 {
+      margin: 0;
+      color: var(--forest-deep);
+      font-family: var(--display);
+      font-size: clamp(58px, 5.4vw, 92px);
+      font-weight: 760;
+      letter-spacing: -0.065em;
+      line-height: 0.9;
+    }
+
+    .hero h1 span { display: block; color: #1b9b4b; }
+
+    .hero-lead {
+      max-width: 560px;
+      margin: 26px 0 0;
+      color: #29493d;
+      font-size: 18px;
+      line-height: 1.55;
+    }
+
+    .stats-panel {
+      width: min(100%, 610px);
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      margin-top: 26px;
+      border: 1px solid rgba(255,255,255,0.86);
+      background: rgba(255,255,255,0.80);
+      border-radius: 12px;
+      box-shadow: 0 16px 44px rgba(45,89,60,0.08);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .stat {
+      position: relative;
+      min-width: 0;
+      padding: 15px 8px 14px;
+      text-align: center;
+    }
+
+    .stat + .stat::before {
+      content: "";
+      position: absolute;
+      top: 18px;
+      bottom: 18px;
+      left: 0;
+      width: 1px;
+      background: rgba(7,88,61,0.10);
+    }
+
+    .stat .icon {
+      width: 18px;
+      height: 18px;
+      margin: 0 auto 6px;
+      color: var(--leaf);
+    }
+
+    .stat strong {
+      display: block;
+      color: var(--forest);
+      font-family: var(--display);
+      font-size: 17px;
+      line-height: 1;
+    }
+
+    .stat span {
+      display: block;
+      margin-top: 6px;
+      color: #5e7167;
+      font-size: 9px;
+      line-height: 1.2;
+    }
+
+    .hero-buttons { display: flex; gap: 12px; margin-top: 23px; }
+
+    /* ==================== 引用与公告 ==================== */
+    main { position: relative; background: var(--white); }
+
+    .citation-wrap {
+      position: relative;
+      z-index: 5;
+      margin-top: -1px;
+      padding: 24px 0 0;
+      background: var(--white);
+      border-radius: 24px 24px 0 0;
+    }
+
+    .citation-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 2.25fr) minmax(280px, 0.75fr);
+      gap: 18px;
+    }
+
+    .citation-card,
+    .call-card {
+      min-height: 142px;
+      border: 1px solid var(--line);
+      background: #fbfdfb;
+      border-radius: 14px;
+    }
+
+    .citation-card {
+      display: block;
+      padding: 23px 25px;
+    }
+
+    .citation-label {
+      margin: 0 0 7px;
+      color: var(--forest);
+      font-size: 13px;
+      font-weight: 750;
+    }
+
+    .citation-text {
+      margin: 0;
+      color: #53635c;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .citation-title {
+      display: block;
+      margin-top: 6px;
+      color: var(--forest-deep);
+      font-weight: 700;
+    }
+
+    .call-card {
+      position: relative;
+      overflow: hidden;
+      padding: 22px 112px 20px 22px;
+      background: linear-gradient(135deg, #f8fbf7, #eef6ec);
+    }
+
+    .call-card::after {
+      content: "";
+      position: absolute;
+      right: -24px;
+      bottom: -33px;
+      width: 145px;
+      height: 165px;
+      opacity: 0.16;
+      background-image: url("home.png");
+      background-position: 80% center;
+      background-size: auto 100%;
+      border-radius: 60% 0 0 0;
+      filter: saturate(0.6);
+    }
+
+    .call-card strong { display: block; color: var(--forest-deep); font-size: 13px; }
+    .call-card p { margin: 7px 0 11px; color: #30483f; font-size: 12px; line-height: 1.45; }
+
+    .text-link {
+      position: relative;
+      z-index: 1;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--forest);
+      font-size: 11px;
+      font-weight: 750;
+    }
+
+    .news-bar {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 18px;
+      min-height: 50px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .news-labels { display: flex; gap: 6px; }
+
+    .news-tab {
+      border: 0;
+      padding: 5px 11px;
+      color: #718078;
+      background: transparent;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .news-tab.active { color: var(--white); background: var(--leaf); }
+
+    .news-items { position: relative; min-width: 0; height: 22px; overflow: hidden; }
+
+    .news-item {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: 220ms ease;
+      pointer-events: none;
+    }
+
+    .news-item.active { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    .news-date { color: var(--forest); font-family: var(--utility); font-size: 10px; font-weight: 700; white-space: nowrap; }
+    .news-item a { min-width: 0; overflow: hidden; color: #52635b; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+    .news-more { color: var(--forest); font-size: 11px; font-weight: 700; white-space: nowrap; }
+
+    /* ==================== 内容区标题与搜索 ==================== */
+    .content-section { padding: 44px 0 10px; }
+    .data-section { padding-top: 34px; padding-bottom: 26px; }
+
+    .section-heading {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 20px;
+    }
+
+    .section-title { margin: 0; color: var(--forest-deep); font-family: var(--display); font-size: 24px; letter-spacing: -0.04em; }
+
+    .section-title::after {
+      content: "";
+      display: block;
+      width: 34px;
+      height: 2px;
+      margin-top: 9px;
+      background: var(--leaf);
+      border-radius: 2px;
+    }
+
+    .section-kicker { margin: 0 0 5px; color: #7b8a82; font-family: var(--utility); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; }
+
+    .tool-filter {
+      position: relative;
+      width: min(400px, 40vw);
+    }
+
+    .tool-filter input {
+      width: 100%;
+      height: 40px;
+      border: 1px solid var(--line);
+      padding: 0 52px 0 17px;
+      color: var(--ink);
+      background: var(--white);
+      border-radius: 999px;
+      font-size: 12px;
+    }
+
+    .filter-button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 48px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border: 0;
+      padding: 0;
+      color: var(--white);
+      background: var(--leaf);
+      border-radius: 0 999px 999px 0;
+      cursor: pointer;
+    }
+
+    .filter-button .icon { width: 17px; height: 17px; }
+
+    /* ==================== 工具与数据卡片 ==================== */
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .tool-card,
+    .data-card {
+      border: 1px solid var(--line);
+      background: linear-gradient(145deg, #fff 10%, #fbfdfb 100%);
+      border-radius: 10px;
+      transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+    }
+
+    .tool-card {
+      min-height: 91px;
+      display: grid;
+      grid-template-columns: 40px 1fr;
+      align-items: center;
+      gap: 11px;
+      padding: 14px 13px;
+    }
+
+    .tool-card:hover,
+    .data-card:hover {
+      border-color: rgba(17,134,83,0.35);
+      box-shadow: 0 13px 28px rgba(11,91,59,0.09);
+      transform: translateY(-3px);
+    }
+
+    .tool-icon,
+    .data-icon {
+      position: relative;
+      display: grid;
+      place-items: center;
+      color: var(--leaf);
+      background: #f0f8f1;
+      border-radius: 8px;
+    }
+
+    .tool-icon { width: 40px; height: 40px; }
+    .tool-icon::after {
+      content: "";
+      position: absolute;
+      inset: 5px;
+      border: 1px solid rgba(17,134,83,0.12);
+      border-radius: 5px;
+    }
+
+    .tool-icon .icon { position: relative; z-index: 1; width: 22px; height: 22px; }
+    .tool-card h3, .data-card h3 { margin: 0; color: var(--forest-deep); font-family: var(--display); font-size: 13px; letter-spacing: -0.015em; line-height: 1.2; }
+    .tool-card p, .data-card p { margin: 5px 0 0; color: #6b7972; font-size: 9px; line-height: 1.35; }
+    .tool-card[hidden] { display: none; }
+
+    .empty-state {
+      display: none;
+      border: 1px dashed var(--line);
+      padding: 28px;
+      color: var(--muted);
+      background: var(--mist);
+      border-radius: 10px;
+      text-align: center;
+      font-size: 13px;
+    }
+
+    .empty-state.visible { display: block; }
+
+    .data-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 13px;
+    }
+
+    .data-card {
+      min-height: 116px;
+      display: grid;
+      grid-template-columns: 56px 1fr;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 20px;
+    }
+
+    .data-icon {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: #eef7ef;
+    }
+
+    .data-icon .icon { width: 29px; height: 29px; }
+    .data-card h3 { font-size: 14px; }
+    .data-card p { max-width: 290px; font-size: 10px; }
+
+    /* ==================== 平台能力与页脚 ==================== */
+    .value-strip {
+      margin-top: 10px;
+      margin-bottom: 38px;
+      padding: 22px 24px;
+      background: linear-gradient(100deg, #f4f9f1, #f8fbf7 55%, #eff7ed);
+      border-radius: 12px;
+    }
+
+    .value-grid { display: grid; grid-template-columns: repeat(4, 1fr); }
+
+    .value-item {
+      display: grid;
+      grid-template-columns: 58px 1fr;
+      align-items: center;
+      gap: 15px;
+      padding: 0 24px;
+    }
+
+    .value-item + .value-item { border-left: 1px solid rgba(7,88,61,0.10); }
+    .value-art { width: 58px; height: 58px; display: grid; place-items: center; color: var(--sprout); }
+    .value-art .icon { width: 48px; height: 48px; stroke-width: 1.15; }
+    .value-item h3 { margin: 0; color: var(--forest-deep); font-family: var(--display); font-size: 14px; }
+    .value-item p { margin: 5px 0 0; color: #65756d; font-size: 10px; line-height: 1.4; }
+
+    .site-footer { color: rgba(255,255,255,0.82); background: var(--forest-deep); }
+
+    .footer-main {
+      display: grid;
+      grid-template-columns: 1.4fr 0.8fr 1fr;
+      gap: 70px;
+      padding-block: 44px 38px;
+    }
+
+    .footer-brand .brand-name { color: var(--white); }
+    .footer-brand .brand-name em { color: #79d18c; }
+    .footer-brand .brand-tagline { color: rgba(255,255,255,0.55); }
+    .footer-wordmark { display: inline-block; }
+    .footer-wordmark .brand-name { display: block; }
+    .footer-wordmark .brand-tagline { display: block; margin-top: 5px; }
+    .footer-note { max-width: 310px; margin: 18px 0 0; color: rgba(255,255,255,0.58); font-size: 11px; line-height: 1.65; }
+
+    .footer-plot {
+      display: block;
+      width: min(860px, 100%);
+      height: auto;
+      margin: 26px auto 22px;
+    }
+
+    .footer-title { margin: 0 0 14px; color: var(--white); font-family: var(--display); font-size: 13px; }
+    .footer-links { display: grid; grid-template-columns: repeat(2, minmax(100px, 1fr)); gap: 8px 18px; }
+    .footer-links a, .contact-line { color: rgba(255,255,255,0.68); font-size: 11px; }
+    .footer-links a:hover { color: var(--white); }
+    .contact-line { display: flex; align-items: flex-start; gap: 9px; margin-bottom: 10px; }
+    .contact-line .icon { width: 15px; height: 15px; flex: none; margin-top: 1px; color: #8ad39b; }
+
+    .footer-bottom {
+      min-height: 44px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 20px;
+      border-top: 1px solid rgba(255,255,255,0.09);
+      color: rgba(255,255,255,0.42);
+      font-family: var(--utility);
+      font-size: 9px;
+    }
+
+    .footer-bottom .copyright { justify-self: start; }
+    .footer-bottom .icp { justify-self: center; text-align: center; white-space: nowrap; }
+    .footer-bottom .back-top { justify-self: end; }
+
+    .back-top {
+      border: 0;
+      padding: 0;
+      color: rgba(255,255,255,0.55);
+      background: transparent;
+      font-size: 10px;
+      cursor: pointer;
+    }
+
+    /* ==================== 响应式适配 ==================== */
+    @media (max-width: 1240px) {
+      :root { --page: min(1160px, calc(100% - 40px)); }
+      .main-nav { gap: 16px; }
+      .header-search { display: none; }
+      .tools-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .hero h1 { font-size: clamp(60px, 7.2vw, 88px); }
+      .value-item { padding-inline: 15px; }
+    }
+
+    @media (max-width: 980px) {
+      :root { --page: min(860px, calc(100% - 34px)); }
+      .site-header {
+        background: #fff;
+      }
+      .header-row { grid-template-columns: 1fr auto; }
+      .menu-toggle { display: grid; }
+      .header-actions .contact-button { display: none; }
+      .header-actions { position: absolute; right: 52px; }
+
+      .main-nav {
+        position: fixed;
+        z-index: 100;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: min(390px, 88vw);
+        display: block;
+        overflow-y: auto;
+        padding: 94px 28px 30px;
+        background: rgba(250,253,250,0.98);
+        box-shadow: -20px 0 50px rgba(4,63,45,0.13);
+        transform: translateX(105%);
+        transition: transform 240ms ease;
+      }
+
+      .nav-open .main-nav { transform: translateX(0); }
+      .nav-item { border-bottom: 1px solid var(--line); }
+      .nav-link, .nav-trigger { width: 100%; min-height: 52px; justify-content: space-between; font-size: 14px; }
+      .nav-link::after, .nav-trigger::after { display: none; }
+      .dropdown { position: static; display: none; min-width: 0; margin: 0 0 10px; border: 0; padding: 0 0 0 10px; box-shadow: none; opacity: 1; visibility: visible; transform: none; }
+      .nav-item:focus-within .dropdown, .nav-item.dropdown-open .dropdown { display: block; }
+      .nav-open .menu-toggle { position: fixed; z-index: 120; top: 22px; right: 18px; }
+      .nav-open .menu-toggle span { opacity: 0; }
+      .nav-open .menu-toggle::before { transform: translateY(6px) rotate(45deg); }
+      .nav-open .menu-toggle::after { transform: translateY(-6px) rotate(-45deg); }
+
+      .hero-inner { padding-block: 124px 56px; }
+      .hero-copy { max-width: 640px; }
+      .citation-grid { grid-template-columns: 1fr; }
+      .call-card { min-height: 122px; }
+      .tools-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .value-grid { grid-template-columns: repeat(2, 1fr); gap: 24px 0; }
+      .value-item:nth-child(3) { border-left: 0; }
+      .footer-main { gap: 36px; }
+    }
+
+    @media (max-width: 720px) {
+      :root { --page: calc(100% - 28px); }
+      .header-row { min-height: 76px; }
+      .brand { min-width: 0; }
+      .brand-name { font-size: 18px; }
+      .brand-tagline { display: none; }
+      .brand-mark { height: 30px; width: auto; }
+      .hero-inner { padding-block: 118px 52px; }
+      .hero h1 { font-size: clamp(44px, 13vw, 60px); }
+      .hero-lead { max-width: 480px; font-size: 16px; }
+      .stats-panel { grid-template-columns: repeat(3, 1fr); max-width: 440px; }
+      .stat:nth-child(4)::before { display: none; }
+      .stat:nth-child(-n+3) { border-bottom: 1px solid rgba(7,88,61,0.10); }
+      .hero-buttons { flex-wrap: wrap; }
+
+      .citation-wrap { border-radius: 16px 16px 0 0; }
+      .citation-card { padding: 20px 18px; }
+      .call-card { padding-right: 92px; }
+      .news-bar { grid-template-columns: 1fr auto; padding-block: 10px; }
+      .news-labels { display: none; }
+      .news-items { grid-column: 1; }
+
+      .content-section { padding-top: 34px; }
+      .section-heading { display: block; }
+      .tool-filter { width: 100%; margin-top: 16px; }
+      .tools-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .tool-card { min-height: 88px; }
+      .data-grid { grid-template-columns: 1fr; }
+      .value-grid { grid-template-columns: 1fr; gap: 0; }
+      .value-item, .value-item:nth-child(3) { border-left: 0; border-top: 1px solid rgba(7,88,61,0.10); padding: 18px 6px; }
+      .value-item:first-child { border-top: 0; }
+      .footer-main { grid-template-columns: 1fr; gap: 28px; }
+      .footer-links { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (max-width: 460px) {
+      .tools-grid { grid-template-columns: 1fr; }
+      .tool-card { min-height: 78px; }
+      .footer-links { grid-template-columns: repeat(2, 1fr); }
+      .footer-bottom { grid-template-columns: 1fr; justify-items: start; padding-block: 14px; }
+      .footer-bottom .copyright,
+      .footer-bottom .icp,
+      .footer-bottom .back-top { justify-self: start; text-align: left; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
+  <!-- ==================== 页面图标资源 ==================== -->
+  <svg aria-hidden="true" width="0" height="0" style="position:absolute;overflow:hidden">
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.7"/><path d="m16 16 4.2 4.2"/></symbol>
+    <symbol id="i-dna" viewBox="0 0 24 24"><path d="M6 2c0 7 12 13 12 20M18 2C18 9 6 15 6 22M8 5h8M7 10h10M7 15h10M8 20h8"/></symbol>
+    <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M20 4C11 4 5 8 5 15c0 3 2 5 5 5 7 0 10-7 10-16Z"/><path d="M4 21c3-6 7-9 13-12"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></symbol>
+    <symbol id="i-sequence" viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h16"/><circle cx="7" cy="6" r="1.6"/><circle cx="17" cy="12" r="1.6"/><circle cx="12" cy="18" r="1.6"/></symbol>
+    <symbol id="i-network" viewBox="0 0 24 24"><circle cx="12" cy="5" r="2.3"/><circle cx="5" cy="18" r="2.3"/><circle cx="19" cy="18" r="2.3"/><path d="m10.7 7-4.4 8.8M13.3 7l4.4 8.8M7.3 18h9.4"/></symbol>
+    <symbol id="i-flask" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6L4.5 19A1.4 1.4 0 0 0 5.7 21h12.6a1.4 1.4 0 0 0 1.2-2L14 9V3"/><path d="M7 16h10"/></symbol>
+    <symbol id="i-chromosome" viewBox="0 0 24 24"><path d="M8 3c4 2 4 6 0 9s-4 7 0 9M16 3c-4 2-4 6 0 9s4 7 0 9M8 7h8M8 17h8"/></symbol>
+    <symbol id="i-wave" viewBox="0 0 24 24"><path d="M2 12h3l2-7 3 14 3-11 3 8 2-4h4"/></symbol>
+    <symbol id="i-marker" viewBox="0 0 24 24"><path d="M5 21V9M12 21V4M19 21V12"/><circle cx="5" cy="6" r="3"/><circle cx="12" cy="2.5" r="2"/><circle cx="19" cy="9" r="3"/></symbol>
+    <symbol id="i-gene" viewBox="0 0 24 24"><path d="M4 17c4-8 12-8 16 0M4 7c4 8 12 8 16 0"/><path d="M7 8v8M12 10v4M17 8v8"/></symbol>
+    <symbol id="i-nodes" viewBox="0 0 24 24"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><circle cx="12" cy="10" r="2"/><path d="m7 6 3.4 3M17 6l-3.4 3M12 12v4"/></symbol>
+    <symbol id="i-primer" viewBox="0 0 24 24"><path d="M6 4c5 0 5 5 5 8s0 8 7 8M18 4c-5 0-5 5-5 8s0 8-7 8"/><path d="M4 4h4M16 4h4M4 20h4M16 20h4"/></symbol>
+    <symbol id="i-scan" viewBox="0 0 24 24"><path d="M8 4H4v4M16 4h4v4M20 16v4h-4M8 20H4v-4"/><path d="M8 9h8M8 12h8M8 15h5"/></symbol>
+    <symbol id="i-helix" viewBox="0 0 24 24"><path d="M7 3c0 6 10 12 10 18M17 3C17 9 7 15 7 21M8 6h8M7 12h10M8 18h8"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11v17H6.5A2.5 2.5 0 0 0 4 22V5.5ZM20 5.5A2.5 2.5 0 0 0 17.5 3H13v17h4.5A2.5 2.5 0 0 1 20 22V5.5Z"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 4 6 4 9s-1 6-4 9M12 3c-3 3-4 6-4 9s1 6 4 9"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V9M10 20V4M16 20v-7M22 20V7"/><path d="M2 20h21"/></symbol>
+    <symbol id="i-cells" viewBox="0 0 24 24"><circle cx="8" cy="8" r="4"/><circle cx="16" cy="15" r="5"/><circle cx="17" cy="5" r="2"/><path d="m6.5 8 2-1M14 14l3 2"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 5 3 8 8 10 5-2 8-5 8-10V6l-8-3Z"/><path d="m8.5 12 2.2 2.2 4.8-5"/></symbol>
+    <symbol id="i-scissors" viewBox="0 0 24 24"><circle cx="6" cy="7" r="3"/><circle cx="6" cy="17" r="3"/><path d="m8.5 8.5 11 8.5M8.5 15.5 19.5 7"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+  </svg>
+
+  <section class="hero" id="home" aria-labelledby="page-title">
+    <div class="hero-bg" aria-hidden="true"></div>
+    <header class="site-header">
+      <div class="container header-row">
+        <a class="brand" href="#home" aria-label="WheatOmics 2.0 home">
+          <img class="brand-mark" src="Logo-small.png" alt="WheatOmics 2.0 logo">
+        </a>
+
+        <nav class="main-nav" id="main-nav" aria-label="Primary navigation">
+          <div class="nav-item"><a class="nav-link active" href="#home">Home</a></div>
+          <div class="nav-item">
+            <button class="nav-trigger" type="button" aria-expanded="false">Tools / Browse
+              <svg class="nav-chevron" viewBox="0 0 12 12" aria-hidden="true"><path d="m3 4.5 3 3 3-3"/></svg>
+            </button>
+            <ul class="dropdown">
+              <li><a href="#tools">Key Tools</a></li>
+              <li><a href="#data">Data in JBrowse</a></li>
+              <li><a href="https://wheatomics.sdau.edu.cn/jbrowse.html">Genome Browser</a></li>
+            </ul>
+          </div>
+          <div class="nav-item">
+            <button class="nav-trigger" type="button" aria-expanded="false">JBrowse
+              <svg class="nav-chevron" viewBox="0 0 12 12" aria-hidden="true"><path d="m3 4.5 3 3 3-3"/></svg>
+            </button>
+            <ul class="dropdown">
+              <li><a href="https://wheatomics.sdau.edu.cn/jbrowse.html">JBrowse Gateway</a></li>
+              <li><a href="#data">Browse Data Types</a></li>
+            </ul>
+          </div>
+          <div class="nav-item"><a class="nav-link" href="https://wheatomics.sdau.edu.cn/download.html">Download Data</a></div>
+          <div class="nav-item"><a class="nav-link" href="https://wheatomics.sdau.edu.cn/outsitelink.html">External Links</a></div>
+          <div class="nav-item">
+            <button class="nav-trigger" type="button" aria-expanded="false">About
+              <svg class="nav-chevron" viewBox="0 0 12 12" aria-hidden="true"><path d="m3 4.5 3 3 3-3"/></svg>
+            </button>
+            <ul class="dropdown">
+              <li><a href="#citation">Citation</a></li>
+              <li><a href="https://wheatomics.sdau.edu.cn/help/news.html">News</a></li>
+              <li><a href="https://wheatomics.sdau.edu.cn/help/contact.html">Contact</a></li>
+            </ul>
+          </div>
+        </nav>
+
+        <div class="header-actions">
+          <form class="header-search" action="https://wheatomics.sdau.edu.cn/cgi-bin/geneDetail.py" method="get">
+            <label for="header-gene" hidden>Search Gene ID or keyword</label>
+            <input id="header-gene" name="search" type="search" placeholder="Search Gene ID / Keyword...">
+            <button type="submit" aria-label="Search"><svg class="icon"><use href="#i-search"/></svg></button>
+          </form>
+          <a class="contact-button" href="mailto:shengweima@icloud.com">Contact Us <span aria-hidden="true">↗</span></a>
+        </div>
+
+        <button class="menu-toggle" type="button" aria-controls="main-nav" aria-expanded="false" aria-label="Open navigation"><span></span></button>
+      </div>
+    </header>
+
+    <div class="container hero-inner">
+      <div class="hero-copy">
+        <h1 id="page-title">WheatOmics <span>2.0</span></h1>
+        <p class="hero-lead">AI Agent-Powered Wheat Pan-Omics Platform</p>
+
+        <div class="stats-panel" aria-label="WheatOmics data statistics">
+          <div class="stat"><svg class="icon"><use href="#i-leaf"/></svg><strong>15+</strong><span>Reference<br>Genomes</span></div>
+          <div class="stat"><svg class="icon"><use href="#i-chromosome"/></svg><strong>50+</strong><span>Triticeae<br>Species</span></div>
+          <div class="stat"><svg class="icon"><use href="#i-dna"/></svg><strong>240K+</strong><span>Pan-transcript<br>Genes</span></div>
+          <div class="stat"><svg class="icon"><use href="#i-nodes"/></svg><strong>2.8B+</strong><span>Genetic<br>Variants</span></div>
+          <div class="stat"><svg class="icon"><use href="#i-book"/></svg><strong>12K+</strong><span>Triticeae<br>Papers</span></div>
+          <div class="stat"><svg class="icon"><use href="#i-wave"/></svg><strong>25K+</strong><span>RNA-seq<br>Samples</span></div>
+        </div>
+
+        <div class="hero-buttons">
+          <a class="primary-button" href="#tools">Explore Tools <span class="button-arrow" aria-hidden="true">→</span></a>
+          <a class="secondary-button" href="#data">Browse Data <span class="button-arrow" aria-hidden="true">⌘</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main id="main-content">
+    <!-- ==================== 论文引用与网站公告 ==================== -->
+    <section class="citation-wrap" id="citation" aria-label="Citation and announcements">
+      <div class="container">
+        <div class="citation-grid">
+          <article class="citation-card">
+            <div>
+              <p class="citation-label">If use WheatOmics in publication, please cite:</p>
+              <p class="citation-text">Shengwei Ma, Meng Wang, Jianhui Wu, Weilong Guo, Yongming Chen, Guangwei Li, Yanpeng Wang, Weiming Shi, Guangmin Xia, Daolin Fu, Zhensheng Kang, Fei Ni. (2021)
+                <a class="citation-title" href="https://doi.org/10.1016/j.molp.2021.10.006" target="_blank" rel="noopener">WheatOmics: a platform combining multiple omics data to accelerate functional genomics studies in wheat. <i>Mol Plant</i> 14:1965–1968.</a>
+              </p>
+            </div>
+          </article>
+
+          <article class="call-card">
+            <strong>Call for Paper:</strong>
+            <p>Integrating multi-omics to empower next-generation wheat breeding.</p>
+            <a class="text-link" href="https://link.springer.com/journal/44412/updates/27812432" target="_blank" rel="noopener">View Details <span aria-hidden="true">→</span></a>
+          </article>
+        </div>
+
+        <div class="news-bar" aria-label="Latest WheatOmics news">
+          <div class="news-labels" role="tablist" aria-label="News categories">
+            <button class="news-tab active" type="button" role="tab" aria-selected="true" data-news="0">News</button>
+            <button class="news-tab" type="button" role="tab" aria-selected="false" data-news="1">Publications</button>
+            <button class="news-tab" type="button" role="tab" aria-selected="false" data-news="2">Journal</button>
+          </div>
+          <div class="news-items">
+            <div class="news-item active" role="tabpanel"><span class="news-date">JUL 27, 2025</span><a href="https://doi.org/10.1101/2025.07.27.667006" target="_blank" rel="noopener">A high-quality bread wheat genome unravels adaptive evolution of wheat end-use quality.</a></div>
+            <div class="news-item" role="tabpanel"><span class="news-date">APR 22, 2025</span><a href="https://doi.org/10.1016/j.molp.2025.12.022" target="_blank" rel="noopener">Telomere-to-telomere genome assembly reveals the genomic architecture of disease resistance and yield coordination.</a></div>
+            <div class="news-item" role="tabpanel"><span class="news-date">OCT 27, 2021</span><a href="https://doi.org/10.1016/j.molp.2021.10.006" target="_blank" rel="noopener">The WheatOmics platform paper was published in Molecular Plant.</a></div>
+          </div>
+          <a class="news-more" href="https://wheatomics.sdau.edu.cn/help/news.html">More <span aria-hidden="true">→</span></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 核心工具矩阵 ==================== -->
+    <section class="content-section" id="tools" aria-labelledby="tools-title">
+      <div class="container">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">Analysis workspace</p>
+            <h2 class="section-title" id="tools-title">Key Tools</h2>
+          </div>
+          <div class="tool-filter">
+            <label for="tool-search" hidden>Filter tools</label>
+            <input id="tool-search" type="search" autocomplete="off" placeholder="Search tools by name or function...">
+            <button class="filter-button" type="button" aria-label="Filter tools"><svg class="icon"><use href="#i-search"/></svg></button>
+          </div>
+        </div>
+
+        <div class="tools-grid" id="tools-grid">
+          <a class="tool-card" href="https://wheatomics.sdau.edu.cn/getfasta/index.html" data-keywords="sequence gene genomic interval fasta"><span class="tool-icon"><svg class="icon"><use href="#i-sequence"/></svg></span><span><h3>GetSequence</h3><p>Query by Gene ID or Genomic Interval</p></span></a>
+          <a class="tool-card" href="https://wheatomics.sdau.edu.cn/blast/blast.html" data-keywords="blast sequence similarity search"><span class="tool-icon"><svg class="icon"><use href="#i-dna"/></svg></span><span><h3>BLAST</h3><p>Sequence Similarity Search</p></span></a>
+          <a class="tool-card" href="https://wheatomics.sdau.edu.cn/tools/proteinfamily.html" data-keywords="pfam protein family domain"><span class="tool-icon"><svg class="icon"><use href="#i-network"/></svg></span><span><h3>PfamSearch</h3><p>Query by Pfam ID</p></span></a>
+          <a class="tool-card" href="https://wheatomics.sdau.edu.cn/PrimerServer" data-keywords="primer design pcr"><span class="tool-icon"><svg class="icon"><use href="#i-primer"/></svg></span><span><h3>PrimerServer</h3><p>Primer Design</p></span></a>
+          <a class="tool-card" href="https://wheatomics.sdau.edu.cn/idConvert/" data-keywords="id converter gene identifier"><span class="tool-icon"><svg class="icon"><use href="#i-scan"/></svg></span><span><h3>IDConverter</h3><p>Gene ID Converter</p></span></a>
+          <a class="tool-card" href="https://wheatomics.sdau.edu.cn/homologtools/index.html" data-keywords="homolog finder gene ortholog"><span class="tool-icon"><svg class="icon"><use href="#i-nodes"/></svg></span><span><h3>HomologFinder</h3><p>Query by Gene ID</p></span></a>
+
+          <a class="tool-card" href="https://wheatomics.sdau.edu.cn/expression/index.html" data-keywords="gene expression rna tissue"><span class="tool-icon"><svg class="icon"><use href="#i-chart"/></svg></span><span><h3>GeneExpression</h3><p>Query by Gene ID</p></span></a>
+          <a class="tool-card" href="https://wheatomics.sdau.edu.cn/coexpression/index.html" data-keywords="coexpression network analysis"><span class="tool-icon"><svg class="icon"><use href="#i-nodes"/></svg></span><span><h3>Co-expression</h3><p>Co-expression Analysis</p></span></a>
+          <a class="tool-card" href="https://wheatomics.sdau.edu.cn/scRNA" data-keywords="single cell scrna rna expression"><span class="tool-icon"><svg class="icon"><use href="#i-cells"/></svg></span><span><h3>scRNA</h3><p>Single-cell RNA Expression</p></span></a>
+          <a class="tool-card" href="https://wheatomics.sdau.edu.cn/wheatPPI/index.html" data-keywords="protein interaction ppi network"><span class="tool-icon"><svg class="icon"><use href="#i-network"/></svg></span><span><h3>WheatPPI</h3><p>Protein Interactions Search</p></span></a>
+          <a class="tool-card" href="https://wheatomics.sdau.edu.cn/wheatPSP/" data-keywords="phase separation protein psp"><span class="tool-icon"><svg class="icon"><use href="#i-cells"/></svg></span><span><h3>wheatPSP</h3><p>Phase Separation-associated Proteins</p></span></a>
+          <a class="tool-card" href="https://wheatomics.sdau.edu.cn/genes" data-keywords="known wheat gene search"><span class="tool-icon"><svg class="icon"><use href="#i-gene"/></svg></span><span><h3>KnownGene</h3><p>Wheat Known Genes Search</p></span></a>
+
+          <a class="tool-card" href="https://wheatomics.sdau.edu.cn/symap/index.html" data-keywords="synteny search collinearity genome"><span class="tool-icon"><svg class="icon"><use href="#i-network"/></svg></span><span><h3>SyntenySearch</h3><p>Query Gene Synteny</p></span></a>
+          <a class="tool-card" href="https://wheatomics.sdau.edu.cn/tools/intervalTools.html" data-keywords="interval gene genome region"><span class="tool-icon"><svg class="icon"><use href="#i-sequence"/></svg></span><span><h3>IntervalTool</h3><p>Gene Information for a Genome Interval</p></span></a>
+          <a class="tool-card" href="https://wheatomics.sdau.edu.cn/caps" data-keywords="caps dcaps primer design marker"><span class="tool-icon"><svg class="icon"><use href="#i-primer"/></svg></span><span><h3>CAPS/dCAPS</h3><p>CAPS/dCAPS Primer Design</p></span></a>
+          <a class="tool-card" href="https://wheatomics.sdau.edu.cn/preblast" data-keywords="preblast alignment sequence"><span class="tool-icon"><svg class="icon"><use href="#i-chart"/></svg></span><span><h3>preBLAST</h3><p>Pre-computed BLAST Alignment</p></span></a>
+          <a class="tool-card" href="https://wheatomics.sdau.edu.cn/sms2" data-keywords="sequence toolkit processing"><span class="tool-icon"><svg class="icon"><use href="#i-dna"/></svg></span><span><h3>SequenceToolkit</h3><p>Multi-purpose Sequence Processing</p></span></a>
+          <a class="tool-card" href="https://wheatomics.sdau.edu.cn/orthofinder" data-keywords="orthofinder orthogroup browser search"><span class="tool-icon"><svg class="icon"><use href="#i-globe"/></svg></span><span><h3>OrthoFinder</h3><p>Orthogroup Browser &amp; Search</p></span></a>
+
+          <a class="tool-card" href="https://wheatomics.sdau.edu.cn/VariantHub" data-keywords="variant population genotype snp indel"><span class="tool-icon"><svg class="icon"><use href="#i-chromosome"/></svg></span><span><h3>VariantHub</h3><p>Wheat Variants &amp; Population Genotypes</p></span></a>
+          <a class="tool-card" href="https://wheatomics.sdau.edu.cn/eqtl" data-keywords="eqtl atlas quantitative trait loci expression"><span class="tool-icon"><svg class="icon"><use href="#i-wave"/></svg></span><span><h3>eQTL Atlas</h3><p>Expression Quantitative Trait Loci</p></span></a>
+          <a class="tool-card" href="https://wheatomics.sdau.edu.cn/GO_KEGG" data-keywords="go kegg enrichment ontology pathway"><span class="tool-icon"><svg class="icon"><use href="#i-nodes"/></svg></span><span><h3>GO/KEGG Enrichment</h3><p>Gene Ontology &amp; KEGG Pathways</p></span></a>
+          <a class="tool-card" href="https://wheatomics.sdau.edu.cn/syntenyview" data-keywords="collinearity genome synteny"><span class="tool-icon"><svg class="icon"><use href="#i-network"/></svg></span><span><h3>Collinearity</h3><p>Genome Synteny &amp; Collinearity</p></span></a>
+          <a class="tool-card" href="https://wheatomics.sdau.edu.cn/papers" data-keywords="triticeae papers literature collection"><span class="tool-icon"><svg class="icon"><use href="#i-book"/></svg></span><span><h3>Triticeae Papers</h3><p>Triticeae Literature Collection</p></span></a>
+        </div>
+        <div class="empty-state" id="tool-empty">No matching tool was found. Try a broader term such as “sequence”, “expression”, or “variant”.</div>
+      </div>
+    </section>
+
+    <!-- ==================== JBrowse 数据入口 ==================== -->
+    <section class="content-section data-section" id="data" aria-labelledby="data-title">
+      <div class="container">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">Genome browser tracks</p>
+            <h2 class="section-title" id="data-title">Data in JBrowse</h2>
+          </div>
+          <form class="tool-filter" action="https://wheatomics.sdau.edu.cn/cgi-bin/geneDetail.py" method="get">
+            <label for="data-gene" hidden>Search Gene ID</label>
+            <input id="data-gene" name="search" type="search" placeholder="Search by Gene ID, e.g. TraesCS1A02G066100">
+            <button class="filter-button" type="submit" aria-label="Search gene"><svg class="icon"><use href="#i-search"/></svg></button>
+          </form>
+        </div>
+
+        <div class="data-grid">
+          <a class="data-card" href="https://wheatomics.sdau.edu.cn/jbrowse-1.12.3-release/?data=Chinese_Spring1.0&amp;loc=chr6D%3A379571657..379574787"><span class="data-icon"><svg class="icon"><use href="#i-dna"/></svg></span><span><h3>Annotated Genomic Features</h3><p>Genes, TEs, lncRNAs, SSRs and other reference annotations.</p></span></a>
+          <a class="data-card" href="https://wheatomics.sdau.edu.cn/jbrowse-1.12.3-release/?data=Chinese_Spring1.0&amp;loc=chr6D%3A112447761..112475060"><span class="data-icon"><svg class="icon"><use href="#i-wave"/></svg></span><span><h3>Transcriptional Level Data</h3><p>PacBio, RNA-seq, EST, cDNA and full-length transcript evidence.</p></span></a>
+          <a class="data-card" href="https://wheatomics.sdau.edu.cn/jbrowse-1.12.3-release/?data=Chinese_Spring1.0&amp;loc=chr6D%3A112444401..112471700"><span class="data-icon"><svg class="icon"><use href="#i-marker"/></svg></span><span><h3>Marker Information</h3><p>SSRs, DArTs, RFLPs and SNP arrays including 90K, 660K and 820K.</p></span></a>
+          <a class="data-card" href="https://wheatomics.sdau.edu.cn/jbrowse-1.12.3-release/?data=Chinese_Spring1.0&amp;loc=chr6D%3A112444341..112471640"><span class="data-icon"><svg class="icon"><use href="#i-nodes"/></svg></span><span><h3>Population Variants</h3><p>GBS, exome and WGS variation, including SNPs and InDels.</p></span></a>
+          <a class="data-card" href="https://wheatomics.sdau.edu.cn/jbrowse-1.12.3-release/?data=Chinese_Spring1.0&amp;loc=chr6D%3A112443861..112471160"><span class="data-icon"><svg class="icon"><use href="#i-cells"/></svg></span><span><h3>Epigenomics and 3D Genomics</h3><p>sRNAs, DNA methylation, histone modification and 3D chromatin.</p></span></a>
+          <a class="data-card" href="https://wheatomics.sdau.edu.cn/jbrowse-1.12.3-release/?data=Chinese_Spring1.0&amp;loc=chr1A:296204831..296210070"><span class="data-icon"><svg class="icon"><use href="#i-flask"/></svg></span><span><h3>EMS Mutants</h3><p>Mutant resources for Jimai22, Cadenza and Kronos.</p></span></a>
+          <a class="data-card" href="https://wheatomics.sdau.edu.cn/jbrowse-1.12.3-release/?data=Chinese_Spring1.0&amp;loc=chr6D%3A112446981..112474280"><span class="data-icon"><svg class="icon"><use href="#i-shield"/></svg></span><span><h3>TF Motifs</h3><p>Genome-wide transcription factor binding sites.</p></span></a>
+          <a class="data-card" href="https://wheatomics.sdau.edu.cn/jbrowse-1.12.3-release/?data=Chinese_Spring1.0&amp;loc=chr6D%3A112446981..112474280"><span class="data-icon"><svg class="icon"><use href="#i-scissors"/></svg></span><span><h3>Gene Editing</h3><p>Pre-designed CRISPR/Cas9 sgRNA resources.</p></span></a>
+          <a class="data-card" href="https://wheatomics.sdau.edu.cn/jbrowse-1.12.3-release/?data=Chinese_Spring1.0&amp;loc=chr1A%3A326329108..326329380"><span class="data-icon"><svg class="icon"><use href="#i-gene"/></svg></span><span><h3>Small RNAs</h3><p>miRNAs, siRNAs, phasiRNAs and degradome evidence.</p></span></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 平台能力概览 ==================== -->
+    <section class="container value-strip" aria-label="Platform advantages">
+      <div class="value-grid">
+        <article class="value-item"><span class="value-art"><svg class="icon"><use href="#i-network"/></svg></span><span><h3>Comprehensive Multi-omics Data</h3><p>Integrated genomes, transcriptomes, variants, proteins and more.</p></span></article>
+        <article class="value-item"><span class="value-art"><svg class="icon"><use href="#i-chart"/></svg></span><span><h3>Powerful Analysis Tools</h3><p>A rich collection of bioinformatics tools for wheat research.</p></span></article>
+        <article class="value-item"><span class="value-art"><svg class="icon"><use href="#i-globe"/></svg></span><span><h3>User-friendly Data Access</h3><p>Intuitive, fast and efficient data browsing experience.</p></span></article>
+        <article class="value-item"><span class="value-art"><svg class="icon"><use href="#i-leaf"/></svg></span><span><h3>Support Open Science</h3><p>Promoting data sharing and accelerating discovery.</p></span></article>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==================== 页脚 ==================== -->
+  <footer class="site-footer">
+    <div class="container footer-main">
+      <div class="footer-brand">
+        <span class="footer-wordmark"><span class="brand-name">WheatOmics <em>2.0</em></span><span class="brand-tagline">AI Agent-Powered Wheat Pan-Omics Platform</span></span>
+        <p class="footer-note">An open wheat multi-omics knowledgebase supporting functional genomics, crop improvement and next-generation breeding.</p>
+      </div>
+
+      <div>
+        <h2 class="footer-title">Quick Links</h2>
+        <div class="footer-links">
+          <a href="#tools">Tools</a><a href="#data">JBrowse</a>
+          <a href="https://wheatomics.sdau.edu.cn/download.html">Download Data</a><a href="https://wheatomics.sdau.edu.cn/outsitelink.html">External Links</a>
+          <a href="https://wheatomics.sdau.edu.cn/help/news.html">News</a><a href="https://wheatomics.sdau.edu.cn/help/contact.html">About Us</a>
+        </div>
+      </div>
+
+      <div>
+        <h2 class="footer-title">Contact Us</h2>
+        <a class="contact-line" href="mailto:shengweima@icloud.com"><svg class="icon"><use href="#i-mail"/></svg><span>shengweima@icloud.com</span></a>
+      </div>
+    </div>
+    <img class="footer-plot" src="footer-plot.png" alt="WheatOmics data overview plot">
+    <div class="container footer-bottom">
+      <span class="copyright">© 2026 WheatOmics. All rights reserved.</span>
+      <span class="icp">鲁公网安备 37090202000305号 ｜ 鲁ICP备05002369号-1</span>
+      <button class="back-top" type="button">Back to top ↑</button>
+    </div>
+  </footer>
+
+  <script>
+    /* ==================== 移动端导航控制 ==================== */
+    const menuToggle = document.querySelector('.menu-toggle');
+    const nav = document.querySelector('.main-nav');
+    const navTriggers = document.querySelectorAll('.nav-trigger');
+
+    menuToggle.addEventListener('click', () => {
+      const isOpen = document.body.classList.toggle('nav-open');
+      menuToggle.setAttribute('aria-expanded', String(isOpen));
+      menuToggle.setAttribute('aria-label', isOpen ? 'Close navigation' : 'Open navigation');
+    });
+
+    nav.addEventListener('click', (event) => {
+      if (event.target.closest('a') && window.innerWidth <= 980) {
+        document.body.classList.remove('nav-open');
+        menuToggle.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    navTriggers.forEach((trigger) => {
+      trigger.addEventListener('click', () => {
+        if (window.innerWidth > 980) return;
+        const item = trigger.closest('.nav-item');
+        const isOpen = item.classList.toggle('dropdown-open');
+        trigger.setAttribute('aria-expanded', String(isOpen));
+      });
+    });
+
+    /* ==================== 新闻标签切换 ==================== */
+    const newsTabs = document.querySelectorAll('.news-tab');
+    const newsItems = document.querySelectorAll('.news-item');
+
+    newsTabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const index = Number(tab.dataset.news);
+        newsTabs.forEach((item) => {
+          item.classList.remove('active');
+          item.setAttribute('aria-selected', 'false');
+        });
+        newsItems.forEach((item) => item.classList.remove('active'));
+        tab.classList.add('active');
+        tab.setAttribute('aria-selected', 'true');
+        newsItems[index].classList.add('active');
+      });
+    });
+
+    /* ==================== 工具卡片即时筛选 ==================== */
+    const toolSearch = document.querySelector('#tool-search');
+    const toolCards = [...document.querySelectorAll('.tool-card')];
+    const toolEmpty = document.querySelector('#tool-empty');
+
+    function filterTools() {
+      const keyword = toolSearch.value.trim().toLowerCase();
+      let visibleCount = 0;
+
+      toolCards.forEach((card) => {
+        const source = `${card.textContent} ${card.dataset.keywords}`.toLowerCase();
+        const matched = !keyword || source.includes(keyword);
+        card.hidden = !matched;
+        if (matched) visibleCount += 1;
+      });
+
+      toolEmpty.classList.toggle('visible', visibleCount === 0);
+    }
+
+    toolSearch.addEventListener('input', filterTools);
+    document.querySelector('.filter-button[type="button"]').addEventListener('click', () => {
+      toolSearch.focus();
+      filterTools();
+    });
+
+    /* ==================== 返回顶部 ==================== */
+    document.querySelector('.back-top').addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

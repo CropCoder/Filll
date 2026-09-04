@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>404 - 页面未找到</title>
+    <style>
+        /* 核心变量定义：Claude 经典温润学院风色系 */
+        :root {
+            --bg-color: #fbfaf7;       /* 标志性米白底色 */
+            --text-main: #191919;      /* 深炭黑 */
+            --text-muted: #666360;     /* 哑光灰 */
+            --accent-color: #cc5500;   /* 微亮陶土红（可选点缀色） */
+            --border-color: #e3dfd5;   /* 柔和边框色 */
+            --font-serif: "Georgia", "Times New Roman", "Source Serif Pro", serif;
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            justify-content: space-between;
+            padding: 40px 24px;
+        }
+
+        /* 顶部导航简易标识 */
+        header {
+            max-width: 640px;
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+        }
+
+        .brand-logo {
+            font-family: var(--font-serif);
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            text-decoration: none;
+            color: var(--text-main);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .brand-logo::before {
+            content: "";
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: var(--text-main);
+            border-radius: 50%;
+        }
+
+        /* 主体内容区域 */
+        main {
+            max-width: 640px;
+            width: 100%;
+            margin: auto;
+            padding: 60px 0;
+        }
+
+        .error-code {
+            font-family: var(--font-serif);
+            font-size: 112px;
+            font-weight: 400;
+            line-height: 1;
+            letter-spacing: -2px;
+            color: var(--text-main);
+            margin-bottom: 24px;
+            opacity: 0.9;
+        }
+
+        .error-title {
+            font-family: var(--font-serif);
+            font-size: 28px;
+            font-weight: 400;
+            line-height: 1.3;
+            margin-bottom: 16px;
+            letter-spacing: -0.5px;
+        }
+
+        .error-message {
+            font-size: 15px;
+            line-height: 1.6;
+            color: var(--text-muted);
+            margin-bottom: 40px;
+            max-width: 520px;
+        }
+
+        /* 极简按钮与交互 */
+        .action-group {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background-color: var(--text-main);
+            color: var(--bg-color);
+            border: 1px solid var(--text-main);
+        }
+
+        .btn-primary:hover {
+            background-color: #333333;
+            border-color: #333333;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(0, 0, 0, 0.03);
+            border-color: var(--text-main);
+            transform: translateY(-1px);
+        }
+
+        /* 页脚区域 */
+        footer {
+            max-width: 640px;
+            width: 100%;
+            margin: 0 auto;
+            border-top: 1px solid var(--border-color);
+            padding-top: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        footer a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.15s ease;
+        }
+
+        footer a:hover {
+            color: var(--text-main);
+            text-decoration: underline;
+        }
+
+        /* 移动端响应式优化 */
+        @media (max-width: 480px) {
+            body {
+                padding: 24px 16px;
+            }
+            .error-code {
+                font-size: 80px;
+            }
+            .error-title {
+                font-size: 24px;
+            }
+            .action-group {
+                flex-direction: column;
+                width: 100%;
+            }
+            .btn {
+                width: 100%;
+            }
+            footer {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="/" class="brand-logo">filll.cn</a>
+    </header>
+
+    <main>
+        <div class="error-code">404</div>
+        <p class="error-message">
+            该链接可能已失效、被移除，请检查您输入的网址是否正确。
+        </p>
+        
+        <div class="action-group">
+            <a href="/" class="btn btn-primary">返回首页</a>
+            <a href="mailto:admin@filll.cn" class="btn btn-secondary">报告问题</a>
+        </div>
+    </main>
+
+    <footer>
+        <div>&copy; 2026 filll.cn. All rights reserved.</div>
+        <div>
+            Help: <a href="mailto:admin@filll.cn">admin@filll.cn</a>
+        </div>
+    </footer>
+
+</body>
+</html>
