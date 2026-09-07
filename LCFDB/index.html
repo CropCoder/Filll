@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FungalGenDB — Fungal Genomics & Functional Annotation</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ==================== 顶部导航栏（约 68 px 深蓝） ==================== -->
+  <header class="topbar" id="topbar">
+    <div class="topbar-inner">
+      <!-- 数据库名称 + 英文简介（名称可在 CONFIG 中配置） -->
+      <a class="brand" href="#results" id="brand-link">
+        <span class="brand-name" id="brand-name">FungalGenDB</span>
+        <span class="brand-tag" id="brand-tag">Fungal Genomics &amp; Functional Annotation</span>
+      </a>
+      <!-- 宽搜索框 + 实时结果下拉 -->
+      <div class="top-search" id="top-search">
+        <span class="search-ico" aria-hidden="true"></span>
+        <input id="nav-q" type="text"
+               placeholder="Search genes, proteins, species, GO, KEGG..."
+               autocomplete="off" aria-label="Search">
+        <kbd>/</kbd>
+        <div class="search-drop" id="search-drop" hidden></div>
+      </div>
+      <!-- 右侧入口 -->
+      <nav class="top-nav">
+        <div class="dropdown" id="dd-tools">
+          <button class="dd-btn" type="button">Tools</button>
+          <div class="dd-menu">
+            <button type="button" id="btn-export">Download current results (TSV)</button>
+            <button type="button" id="btn-copy">Copy gene summary</button>
+          </div>
+        </div>
+        <a href="#" id="nav-download">Download</a>
+        <a href="#" id="nav-help">Help</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ==================== 面包屑（浅灰背景） ==================== -->
+  <div class="crumbbar" id="crumbbar">
+    <nav class="crumb" id="crumb">
+      <a href="#results" data-crumb="home">Home</a><span class="sep">›</span><span>Species</span>
+    </nav>
+  </div>
+
+  <!-- ==================== 检索结果视图 ==================== -->
+  <section class="page" id="view-list">
+    <!-- 检索面板 -->
+    <section class="search-panel" id="search-panel">
+      <div class="sp-row-main">
+        <div class="sp-field grow">
+          <label for="q">Keyword search</label>
+          <input id="q" type="text"
+                 placeholder="Gene ID / species / description / seed ortholog / GO / InterPro / KEGG / Pfam ...">
+        </div>
+        <div class="sp-field">
+          <label for="f-species">Species</label>
+          <select id="f-species"><option value="">All</option></select>
+        </div>
+        <div class="sp-field">
+          <label for="f-cog">COG category</label>
+          <select id="f-cog"><option value="">All</option></select>
+        </div>
+        <div class="sp-field">
+          <label for="f-pfam">Pfam family</label>
+          <select id="f-pfam"><option value="">All</option></select>
+        </div>
+        <div class="sp-field">
+          <label for="f-preset">Quick filter</label>
+          <select id="f-preset">
+            <option value="">None</option>
+            <option value="ko">Has KEGG KO</option>
+            <option value="go">Has GO annotations</option>
+            <option value="pfam">Has Pfam domains</option>
+            <option value="cazy">Has CAZy</option>
+            <option value="ec">Has EC number</option>
+            <option value="pathway">Has KEGG pathways</option>
+          </select>
+        </div>
+      </div>
+      <div class="sp-row-num">
+        <div class="sp-field">
+          <label>Protein length (aa)</label>
+          <input id="n-len-min" type="number" min="0" placeholder="Min">
+          <span class="dash">–</span>
+          <input id="n-len-max" type="number" min="0" placeholder="Max">
+        </div>
+        <div class="sp-field">
+          <label>E-value</label>
+          <select id="n-evalue">
+            <option value="">Any</option>
+            <option value="0">= 0</option>
+            <option value="1e-100">≤ 1e-100</option>
+            <option value="1e-50">≤ 1e-50</option>
+            <option value="1e-10">≤ 1e-10</option>
+            <option value="1e-5">≤ 1e-5</option>
+            <option value="1">≤ 1</option>
+          </select>
+        </div>
+        <div class="sp-field">
+          <label>Score (bits)</label>
+          <input id="n-score-min" type="number" min="0" placeholder="Min">
+        </div>
+        <div class="sp-actions">
+          <button id="btn-search" class="btn-primary">Search</button>
+          <button id="btn-reset" class="btn-ghost">Reset</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 结果列表 -->
+    <div class="results-head">
+      <div>
+        <span class="rh-title" id="lt-label">Search results</span>
+        <span class="rh-count" id="lt-n"></span>
+      </div>
+      <div class="rh-sort">
+        <label for="sort">Sort by</label>
+        <select id="sort">
+          <option value="geneid">Gene ID</option>
+          <option value="len-desc">Protein length (desc)</option>
+          <option value="len-asc">Protein length (asc)</option>
+          <option value="score-desc">Score (desc)</option>
+          <option value="evalue-asc">E-value (asc)</option>
+          <option value="go-desc">GO count (desc)</option>
+        </select>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table id="result-table">
+        <thead>
+          <tr>
+            <th class="c-gene">Gene ID</th>
+            <th class="c-species">Species / Strain</th>
+            <th class="c-len">Length</th>
+            <th class="c-desc">Description</th>
+            <th class="c-go">GO</th>
+            <th class="c-ko">KO</th>
+            <th class="c-pwy">Pathways</th>
+            <th class="c-ipr">InterPro</th>
+            <th class="c-dom">Domains</th>
+          </tr>
+        </thead>
+        <tbody id="result-body"></tbody>
+      </table>
+    </div>
+    <div id="empty-state" class="empty hidden">
+      <p>No matching gene records</p>
+      <p class="empty-tip">Try relaxing the filters or clearing the keyword</p>
+    </div>
+    <div class="pager" id="pager"></div>
+  </section>
+
+  <!-- ==================== 基因详情视图 ==================== -->
+  <section class="page hidden" id="view-detail">
+    <div class="detail-layout" id="detail-layout">
+
+      <!-- 左侧目录（约 225 px，浅蓝高亮 + 左侧蓝色竖线，滚动联动） -->
+      <nav class="toc" id="toc" aria-label="Section navigation"></nav>
+
+      <!-- 主内容 -->
+      <main class="detail-main" id="detail-main"></main>
+
+    </div>
+  </section>
+
+  <!-- ==================== Help 模态框 ==================== -->
+  <div class="modal-mask hidden" id="help-modal">
+    <div class="modal">
+      <div class="modal-head">
+        <h2>Help</h2>
+        <button class="modal-close" id="help-close" type="button" aria-label="Close">×</button>
+      </div>
+      <div class="modal-body" id="help-body"></div>
+    </div>
+  </div>
+
+  <!-- ==================== 提示浮层 ==================== -->
+  <div id="toast"></div>
+
+  <!-- ==================== 脚本加载 ==================== -->
+  <!-- 数据文件：由 Script1-Parse-Annotation-Data-V1.R 生成（window.FDB_DATA） -->
+  <script src="data.js"></script>
+  <!-- 应用逻辑 -->
+  <script src="js/Script2-Strain-Search-App-V1.js"></script>
+</body>
+</html>
