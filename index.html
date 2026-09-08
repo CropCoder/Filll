@@ -1,422 +1,464 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>飞荔科学 | Filll Science Studio</title>
+    <title>Filll Studio — AI × Bioscience + Software</title>
+    <meta name="description" content="Filll Studio is an independent research and technology studio exploring the intersection of artificial intelligence, bioscience, algorithms, and software engineering.">
     <link rel="shortcut icon" href="https://www.filll.cn/upload/logo.png">
-    <!-- 引入 Google Fonts (Inter) 以获得类似的现代无衬线字体风格 -->
+
+    <!-- Fonts: Inter for headings/body + IBM Plex Mono for data/labels -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&display=swap" rel="stylesheet">
 
-    <!-- 引入 Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Brand design system -->
+    <link rel="stylesheet" href="css/filll.css">
 
-    <!-- 配置自定义颜色和字体 -->
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        // Arc 风格偏向这种冷淡且略带暖意的灰色
-                        'arc-dark': '#1a1a1a',
-                        'arc-gray': '#888888',
-                        'arc-light': '#f9f9f9',
-                        'arc-border': '#e5e5e5',
-                    }
-                }
-            }
-        }
+    <!-- Three.js import map (for Explore section animations) -->
+    <script type="importmap">
+        { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
     </script>
-
-    <style>
-        /* 自定义一些细微的动画 */
-        .fade-in-up {
-            animation: fadeInUp 0.8s ease-out forwards;
-            opacity: 0;
-            transform: translateY(20px);
-        }
-
-        @keyframes fadeInUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* 模仿 Arc 的链接下划线效果 */
-        .hover-underline-animation {
-            display: inline-block;
-            position: relative;
-        }
-
-        .hover-underline-animation::after {
-            content: '';
-            position: absolute;
-            width: 100%;
-            transform: scaleX(0);
-            height: 1px;
-            bottom: 0;
-            left: 0;
-            background-color: #1a1a1a;
-            transform-origin: bottom right;
-            transition: transform 0.25s ease-out;
-        }
-
-        .hover-underline-animation:hover::after {
-            transform: scaleX(1);
-            transform-origin: bottom left;
-        }
-    </style>
 </head>
 
-<body class="font-sans text-arc-dark bg-white antialiased selection:bg-stone-200 selection:text-black">
+<body>
 
-    <!-- 导航栏 (Sticky Top) -->
-    <header class="fixed w-full top-0 z-50 bg-white/90 backdrop-blur-sm border-b border-arc-border">
-        <div class="max-w-[1440px] mx-auto px-6 h-16 flex items-center justify-between">
-            <!-- Logo -->
-            <a href="#" class="text-xl font-semibold tracking-tight flex items-center gap-2">
-                <div class="w-4 h-4 bg-stone-800 rounded-full"></div>
-                飞荔科学 ｜ Filll Studio
-            </a>
+    <!-- ============================ Top navigation ============================ -->
+    <header class="site-nav">
+        <div class="wrap nav-inner">
+            <a href="#top" class="brand">Filll Studio</a>
 
-            <!-- Nav Links -->
-            <nav class="hidden md:flex gap-8 text-sm font-medium text-stone-600">
-                <a href="https://filll.cn/" target="_blank" class="hover:text-black transition-colors">Home</a>
-                <a href="https://www.filll.cn/" target="_blank" class="hover:text-black transition-colors">Blog</a>
-                <!-- <a href="https://filll.cn/iPCR" target="_blank" class="hover:text-black transition-colors">iPCR</a>
-                <a href="https://filll.cn/Plot/" target="_blank" class="hover:text-black transition-colors">OnlinePlot</a> -->
-                <a href="tools/ANOVA" target="_blank" class="hover:text-black transition-colors">Tools</a>
-                <a href="tools/merge_fa" target="_blank" class="hover:text-black transition-colors">MergeFa</a>
-                <a href="tools/GetKmer" target="_blank" class="hover:text-black transition-colors">GetKmer</a>
-                <a href="tools/MutiCompare" target="_blank" class="hover:text-black transition-colors">MutiCompare</a>
-                <a href="WheatTools/GeneID" target="_blank" class="hover:text-black transition-colors">WheatGeneID</a>
-                <a href="http://10.33.34.55:3455/" target="_blank" class="hover:text-black transition-colors">CDRT</a>
-                
+            <nav class="nav-links" aria-label="Primary navigation">
+                <a href="#explore">Explore</a>
+                <a href="#network">Research</a>
+                <a href="#projects">Projects</a>
+                <a href="#ai-for-science">AI for Science</a>
+                <a href="#software">Software</a>
+                <a href="#about">About</a>
             </nav>
 
-            <!-- Mobile Menu Button (Visual only) -->
-            <button class="md:hidden text-stone-800">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                    stroke="currentColor" class="w-6 h-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 9h16.5m-16.5 6.75h16.5" />
+            <button class="nav-burger" id="nav-burger" aria-label="Open menu">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                    <path stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16" />
                 </svg>
             </button>
         </div>
     </header>
 
-    <!-- 主内容区域 -->
-    <main class="pt-16">
+    <!-- Mobile menu -->
+    <div class="mobile-menu" id="mobile-menu">
+        <a href="#explore">Explore</a>
+        <a href="#network">Research</a>
+        <a href="#projects">Projects</a>
+        <a href="#ai-for-science">AI for Science</a>
+        <a href="#software">Software</a>
+        <a href="#about">About</a>
+    </div>
 
-        <!-- Hero Section: 视频背景版 -->
-        <!-- 1. 在 section 加上 relative 和 overflow-hidden，限制视频不跑出去 -->
-        <section class="relative w-full border-b border-arc-border overflow-hidden">
+    <main id="top">
 
-            <!-- === 视频背景层 === -->
-            <!-- autoplay:自动播放 loop:循环 muted:静音(浏览器限制必须静音才能自动播) playsinline:手机端内联播放 -->
-            <video autoplay loop muted playsinline class="absolute inset-0 w-full h-full object-cover z-0">
-                <!-- 请将下面的 'your-video.mp4' 换成你实际的视频文件名 -->
-                <source src="Protein.mp4" type="video/mp4">
-            </video>
+        <!-- ============================ Hero ============================ -->
+        <section class="hero">
+            <!-- Video background layer -->
+            <div class="hero-media">
+                <video autoplay loop muted playsinline>
+                    <source src="Protein.mp4" type="video/mp4">
+                </video>
+            </div>
+            <!-- Particle network animation -->
+            <canvas class="hero-particles" id="hero-particles" aria-hidden="true"></canvas>
 
-            <!-- === 遮罩层 (关键) === -->
-            <!-- 使用 bg-white/90 (90%不透明度的白色) 让视频隐约可见，保证文字清晰 -->
-            <!-- 如果想要视频更清楚，可以把 90 改成 50 或 70 -->
-            <div class="absolute inset-0 bg-white/10 z-0"></div>
+            <div class="wrap hero-content">
+                <span class="hero-badge"><span class="dot"></span>https://Filll.cn</span>
+                <h1 class="hero-title">Where science<br>meets <span class="accent">computation</span>.</h1>
+                <p class="hero-lead">
+                    The most exciting questions in science today are crossing traditional disciplinary boundaries.
+                    Artificial intelligence is changing how we understand data, bioscience is generating information
+                    at an unprecedented scale, and algorithms and software are becoming part of scientific discovery
+                    itself. Filll Studio exists to explore the connections between these fields.
+                </p>
+                <span class="hero-tag">Exploring Intelligence, Life &amp; Computation</span>
+            </div>
 
-            <!-- === 内容层 === -->
-            <!-- 加上 relative 和 z-10，确保文字浮在视频和遮罩上面 -->
-            <div class="relative z-10 max-w-[1440px] mx-auto px-6 py-24 md:py-32">
-                <div class="max-w-4xl fade-in-up">
-                    <h1
-                        class="text-4xl md:text-6xl lg:text-7xl font-medium leading-[1.1] tracking-tight mb-8 text-stone-900">
-                        迈向未来<br>
-                        <span class="text-stone-400">定制化科技创新工具链</span>
-                    </h1>
-                    <p class="text-xl md:text-2xl text-stone-500 font-light max-w-2xl leading-relaxed">
-                        Filll Studio 致力于构建全新的科研协作模式。我们将生物学、数据科学与人工智能技术深度融合，旨在解开复杂科学谜题。
+            <div class="hero-scroll" aria-hidden="true">
+                <span>SCROLL</span>
+                <span class="arrow"></span>
+            </div>
+        </section>
+
+        <!-- ============================ 01 / EXPLORE ============================ -->
+        <section class="section" id="explore">
+            <div class="wrap">
+                <div class="sec-head reveal">
+                    <span class="eyebrow">01 / Explore</span>
+                    <h2 class="title">We work at the intersection of life, intelligence, and computation.</h2>
+                    <p class="lead">
+                        Artificial intelligence, bioscience, advanced algorithms, and software engineering come
+                        together to create new research tools and digital products. These are not four separate
+                        lines of business, but a single unifying narrative.
                     </p>
                 </div>
-            </div>
-        </section>
 
-        <!-- Mission Statement: 左右布局 -->
-        <section class="max-w-[1440px] mx-auto border-b border-arc-border">
-            <div class="grid grid-cols-1 md:grid-cols-12 min-h-[600px]">
-                <!-- 左侧：标题 -->
-                <div class="md:col-span-4 p-6 md:p-12 border-b md:border-b-0 md:border-r border-arc-border bg-stone-50">
-                    <span class="uppercase text-xs font-semibold tracking-widest text-stone-500 mb-4 block">我们的愿景</span>
-                    <h2 class="text-3xl font-medium mb-6">打破学科壁垒，<br>重塑发现流程。</h2>
-                    <a href="login.html"
-                        class="text-sm font-medium border-b border-stone-300 pb-0.5 hover:border-black transition-colors inline-block mt-4">现在即刻开始使用
-                        &rarr;</a>
-                    <img class = "h-auto w-auto" src="image.png" href="Image Description">
-                    
+                <div class="explore-list">
 
-                </div>
+                    <!-- AI -->
+                    <article class="explore-item">
+                        <div>
+                            <span class="explore-index">01</span>
+                            <h3><span class="kicker">Machine Intelligence</span>Artificial Intelligence</h3>
+                            <div class="explore-tags">
+                                <span>Large Language Models</span><span>AI Agents</span><span>Multimodal AI</span>
+                                <span>Scientific AI</span><span>Knowledge Systems</span><span>Machine Learning</span>
+                            </div>
+                            <p class="explore-desc">Exploring how AI understands complex knowledge, processes scientific data, and becomes a new kind of tool for research and creation.</p>
+                        </div>
+                        <div class="explore-visual" data-anim="ai">
+                            <span class="visual-caption">Neural Network · Embedding Space</span>
+                        </div>
+                    </article>
 
-                <!-- 右侧：详细内容 -->
-                <div class="md:col-span-8 p-6 md:p-12 flex flex-col justify-center">
-                    <div class="grid gap-12 md:grid-cols-2">
+                    <!-- Bioscience -->
+                    <article class="explore-item">
                         <div>
-                            <h3 class="text-lg font-semibold mb-3">长期主义研究</h3>
-                            <p class="text-stone-600 leading-relaxed text-sm">
-                                我们摆脱了传统短期资助的限制，让科学家能够专注于高风险、高回报的基础研究，探索未知的生物学领域。
-                            </p>
+                            <span class="explore-index">02</span>
+                            <h3><span class="kicker">Computational Biology</span>Bioscience</h3>
+                            <div class="explore-tags">
+                                <span>Genomics</span><span>Pangenomics</span><span>Bioinformatics</span>
+                                <span>Genetics</span><span>Plant Science</span><span>Scientific Databases</span>
+                            </div>
+                            <p class="explore-desc">From genomes to complex living systems, using computational methods to understand life's information and genetic variation.</p>
                         </div>
+                        <div class="explore-visual" data-anim="bioscience">
+                            <span class="visual-caption">DNA Double Helix · Genomics</span>
+                        </div>
+                    </article>
+
+                    <!-- Algorithms -->
+                    <article class="explore-item">
                         <div>
-                            <h3 class="text-lg font-semibold mb-3">技术驱动平台</h3>
-                            <p class="text-stone-600 leading-relaxed text-sm">
-                                内部开发的先进基因编辑与计算平台，为研究人员提供了前所未有的工具，以原子级的精度理解生命机制。
-                            </p>
+                            <span class="explore-index">03</span>
+                            <h3><span class="kicker">Algorithms &amp; Computation</span>Algorithms</h3>
+                            <div class="explore-tags">
+                                <span>Optimization</span><span>Graph Algorithms</span><span>Data Structures</span>
+                                <span>Statistical Computing</span><span>Machine Learning Algorithms</span><span>High-performance Computing</span>
+                            </div>
+                            <p class="explore-desc">Turning mathematical ideas into computational methods that solve real problems.</p>
                         </div>
+                        <div class="explore-visual" data-anim="algorithms">
+                            <span class="visual-caption">Graph · Matrix · Optimization</span>
+                        </div>
+                    </article>
+
+                    <!-- Software -->
+                    <article class="explore-item">
                         <div>
-                            <h3 class="text-lg font-semibold mb-3">开放科学协作</h3>
-                            <p class="text-stone-600 leading-relaxed text-sm">
-                                我们相信知识应当共享。所有的研究成果、数据和工具都将尽可能开源，以加速全球科学界的进步。
-                            </p>
+                            <span class="explore-index">04</span>
+                            <h3><span class="kicker">Software Engineering</span>Software</h3>
+                            <div class="explore-tags">
+                                <span>Web Applications</span><span>Scientific Software</span><span>Data Platforms</span>
+                                <span>APIs</span><span>Visualization</span><span>Developer Tools</span>
+                            </div>
+                            <p class="explore-desc">Turning research, algorithms, and ideas into software systems that people can actually use.</p>
                         </div>
-                        <div>
-                            <h3 class="text-lg font-semibold mb-3">跨学科团队</h3>
-                            <p class="text-stone-600 leading-relaxed text-sm">
-                                我们的实验室里，生物学家与机器学习工程师并肩工作，共同定义问题并寻找解决方案。
-                            </p>
+                        <div class="explore-visual" data-anim="software">
+                            <span class="visual-caption">System · Architecture · Code</span>
                         </div>
-                        <div>
-                            <h3 class="text-lg font-semibold mb-3">开放科学协作</h3>
-                            <p class="text-stone-600 leading-relaxed text-sm">
-                                我们相信知识应当共享。所有的研究成果、数据和工具都将尽可能开源，以加速全球科学界的进步。
-                            </p>
-                        </div>
-                        <div>
-                            <h3 class="text-lg font-semibold mb-3">跨学科团队</h3>
-                            <p class="text-stone-600 leading-relaxed text-sm">
-                                我们的实验室里，生物学家与机器学习工程师并肩工作，共同定义问题并寻找解决方案。
-                            </p>
-                        </div>
-                        <div>
-                            <h3 class="text-lg font-semibold mb-3">开放科学协作</h3>
-                            <p class="text-stone-600 leading-relaxed text-sm">
-                                我们相信知识应当共享。所有的研究成果、数据和工具都将尽可能开源，以加速全球科学界的进步。
-                            </p>
-                        </div>
-                        <div>
-                            <h3 class="text-lg font-semibold mb-3">跨学科团队</h3>
-                            <p class="text-stone-600 leading-relaxed text-sm">
-                                我们的实验室里，生物学家与机器学习工程师并肩工作，共同定义问题并寻找解决方案。
-                            </p>
-                        </div>
-                    </div>
+                    </article>
+
                 </div>
             </div>
         </section>
 
-        <!-- Research Areas: 模仿 Arc 的网格卡片风格 -->
-        <section class="max-w-[1440px] mx-auto border-b border-arc-border">
-            <div class="p-6 md:p-12">
-                <div class="flex justify-between items-end mb-12">
-                    <h2 class="text-3xl md:text-4xl font-medium">项目案例</h2>
-                    <a href="#" class="hidden md:block text-sm text-stone-500 hover:text-black">查看所有出版物</a>
+        <!-- ============================ 02 / INTERDISCIPLINARY ============================ -->
+        <section class="section" id="network" style="padding-top: 0;">
+            <div class="wrap">
+                <div class="sec-head reveal">
+                    <span class="eyebrow">02 / Interdisciplinary</span>
+                    <h2 class="title">Everything is connected.</h2>
+                    <p class="lead">
+                        Filll Studio is not four separate directions, but one interdisciplinary research effort.
+                        Hover over any node to see how it lights up its connections to neighboring fields.
+                    </p>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-4 border-t border-l border-arc-border">
-                    <!-- Card 1 -->
-                    <div
-                        class="group border-r border-b border-arc-border p-8 hover:bg-stone-50 transition-colors cursor-pointer h-80 flex flex-col justify-between">
-                        <div>
-                            <span class="text-xs font-mono text-stone-400 mb-2 block">01</span>
-                            <h3 class="text-xl font-medium group-hover:text-stone-600 transition-colors">植物免疫通路</h3>
-                            
-                        </div>
-                        <div
-                            class="w-8 h-8 rounded-full border border-stone-200 flex items-center justify-center group-hover:bg-stone-200 transition-colors">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                            </svg>
-                        </div>
-                    </div>
+                <div class="netmap reveal">
+                    <svg viewBox="0 0 900 560" role="img" aria-label="Interdisciplinary network map">
+                        <!-- Edges -->
+                        <line class="map-edge" data-a="llm"      data-b="agents"   x1="450" y1="45"  x2="450" y2="115"/>
+                        <line class="map-edge" data-a="agents"   data-b="ml"       x1="450" y1="115" x2="450" y2="185"/>
+                        <line class="map-edge" data-a="ml"       data-b="bioinfo"  x1="450" y1="185" x2="390" y2="265"/>
+                        <line class="map-edge" data-a="ml"       data-b="algo"     x1="450" y1="185" x2="620" y2="255"/>
+                        <line class="map-edge" data-a="genomics" data-b="bioinfo"  x1="200" y1="255" x2="390" y2="265"/>
+                        <line class="map-edge" data-a="genomics" data-b="pangenome" x1="200" y1="255" x2="150" y2="335"/>
+                        <line class="map-edge" data-a="bioinfo"  data-b="algo"     x1="390" y1="265" x2="620" y2="255"/>
+                        <line class="map-edge" data-a="pangenome" data-b="genetics" x1="150" y1="335" x2="200" y2="420"/>
+                        <line class="map-edge" data-a="algo"     data-b="graph"    x1="620" y1="255" x2="620" y2="340"/>
+                        <line class="map-edge" data-a="genetics" data-b="graph"    x1="200" y1="420" x2="620" y2="340"/>
+                        <line class="map-edge" data-a="genetics" data-b="plantsci" x1="200" y1="420" x2="150" y2="500"/>
+                        <line class="map-edge" data-a="graph"    data-b="software" x1="620" y1="340" x2="620" y2="420"/>
+                        <line class="map-edge" data-a="software" data-b="viz"      x1="620" y1="420" x2="620" y2="500"/>
+                        <line class="map-edge" data-a="plantsci" data-b="scidb"    x1="150" y1="500" x2="330" y2="500"/>
+                        <line class="map-edge" data-a="scidb"    data-b="viz"      x1="330" y1="500" x2="620" y2="500"/>
 
-                    <!-- Card 2 -->
-                    <div
-                        class="group border-r border-b border-arc-border p-8 hover:bg-stone-50 transition-colors cursor-pointer h-80 flex flex-col justify-between">
-                        <div>
-                            <span class="text-xs font-mono text-stone-400 mb-2 block">02</span>
-                            <h3 class="text-xl font-medium group-hover:text-stone-600 transition-colors">基因组工程与修复</h3>
-                        </div>
-                        <div
-                            class="w-8 h-8 rounded-full border border-stone-200 flex items-center justify-center group-hover:bg-stone-200 transition-colors">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                            </svg>
-                        </div>
-                    </div>
+                        <!-- Nodes + labels -->
+                        <g><circle class="map-node" data-node="llm" cx="450" cy="45" r="9"/><text class="map-label" x="466" y="49">LLM</text></g>
+                        <g><circle class="map-node" data-node="agents" cx="450" cy="115" r="9"/><text class="map-label" x="466" y="119">AI Agents</text></g>
+                        <g><circle class="map-node" data-node="ml" cx="450" cy="185" r="9"/><text class="map-label" x="466" y="189">Machine Learning</text></g>
+                        <g><circle class="map-node" data-node="bioinfo" cx="390" cy="265" r="9"/><text class="map-label" x="408" y="269">Bioinformatics</text></g>
+                        <g><circle class="map-node" data-node="genomics" cx="200" cy="255" r="9"/><text class="map-label" x="184" y="259" text-anchor="end">Genomics</text></g>
+                        <g><circle class="map-node" data-node="pangenome" cx="150" cy="335" r="9"/><text class="map-label" x="134" y="339" text-anchor="end">Pangenome</text></g>
+                        <g><circle class="map-node" data-node="algo" cx="620" cy="255" r="9"/><text class="map-label" x="636" y="259">Algorithms</text></g>
+                        <g><circle class="map-node" data-node="graph" cx="620" cy="340" r="9"/><text class="map-label" x="636" y="344">Graph</text></g>
+                        <g><circle class="map-node" data-node="genetics" cx="200" cy="420" r="9"/><text class="map-label" x="184" y="424" text-anchor="end">Genetics</text></g>
+                        <g><circle class="map-node" data-node="plantsci" cx="150" cy="500" r="9"/><text class="map-label" x="134" y="504" text-anchor="end">Plant Science</text></g>
+                        <g><circle class="map-node" data-node="scidb" cx="330" cy="500" r="9"/><text class="map-label" x="346" y="504">Scientific DB</text></g>
+                        <g><circle class="map-node" data-node="software" cx="620" cy="420" r="9"/><text class="map-label" x="636" y="424">Software</text></g>
+                        <g><circle class="map-node" data-node="viz" cx="620" cy="500" r="9"/><text class="map-label" x="636" y="504">Visualization</text></g>
+                    </svg>
+                </div>
+            </div>
+        </section>
 
-                    <!-- Card 3 -->
-                    <div
-                        class="group border-r border-b border-arc-border p-8 hover:bg-stone-50 transition-colors cursor-pointer h-80 flex flex-col justify-between">
-                        <div>
-                            <span class="text-xs font-mono text-stone-400 mb-2 block">03</span>
-                            <h3 class="text-xl font-medium group-hover:text-stone-600 transition-colors">AI 辅助蛋白质设计</h3>
-                        </div>
-                        <div
-                            class="w-8 h-8 rounded-full border border-stone-200 flex items-center justify-center group-hover:bg-stone-200 transition-colors">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                            </svg>
-                        </div>
-                    </div>
+        <!-- ============================ 03 / SELECTED PROJECTS ============================ -->
+        <section class="section" id="projects">
+            <div class="wrap">
+                <div class="sec-head reveal">
+                    <span class="eyebrow">03 / Selected Projects</span>
+                    <h2 class="title">Things we build.</h2>
+                    <p class="lead">From genomic data platforms to AI agents, we build digital products that connect science and computation.</p>
+                </div>
 
-                    <!-- Card 4 -->
-                    <div
-                        class="group border-r border-b border-arc-border p-8 hover:bg-stone-50 transition-colors cursor-pointer h-80 flex flex-col justify-between">
-                        <div>
-                            <span class="text-xs font-mono text-stone-400 mb-2 block">03</span>
-                            <h3 class="text-xl font-medium group-hover:text-stone-600 transition-colors">AI 辅助蛋白质设计</h3>
+                <div class="bento">
+                    <!-- WheatOmics large card -->
+                    <article class="project-card card-lg reveal">
+                        <div class="card-visual" style="background: radial-gradient(120% 120% at 20% 10%, rgba(163,214,47,0.18), transparent 55%), radial-gradient(100% 100% at 90% 90%, rgba(31,157,107,0.14), transparent 55%);"></div>
+                        <div class="card-body">
+                            <div class="project-tags"><span>Genomics</span><span>AI</span><span>Database</span></div>
+                            <h3>WheatOmics</h3>
+                            <p class="sub">Wheat Multi-omics Knowledgebase</p>
+                            <p class="desc">A data platform for wheat genomics and multi-omics research, integrating genome, genetic variation, expression, functional annotation, and intelligent analysis.</p>
+                            <a class="project-btn" href="#">Learn more <span class="arr">→</span></a>
                         </div>
-                        <div
-                            class="w-8 h-8 rounded-full border border-stone-200 flex items-center justify-center group-hover:bg-stone-200 transition-colors">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                            </svg>
+                    </article>
+
+                    <!-- Rice NLR Atlas -->
+                    <article class="project-card card-md reveal" data-delay="1">
+                        <div class="card-visual" style="background: radial-gradient(120% 120% at 80% 20%, rgba(23,162,184,0.18), transparent 55%);"></div>
+                        <div class="card-body">
+                            <div class="project-tags"><span>Genomics</span><span>Plant Science</span><span>Visualization</span></div>
+                            <h3>Rice NLR Atlas</h3>
+                            <p class="sub">Rice Disease Resistance Explorer</p>
+                            <p class="desc">An NLR data exploration system for rice disease-resistance research, studying resistance genes, diversity, haplotypes, and pangenome structure.</p>
+                            <a class="project-btn" href="#">Learn more <span class="arr">→</span></a>
                         </div>
+                    </article>
+
+                    <!-- BioAgent -->
+                    <article class="project-card card-sm reveal" data-delay="2">
+                        <div class="card-visual" style="background: radial-gradient(120% 120% at 50% 0%, rgba(110,98,224,0.2), transparent 60%);"></div>
+                        <div class="card-body">
+                            <div class="project-tags"><span>AI</span><span>Biology</span></div>
+                            <h3>BioAgent</h3>
+                            <p class="sub">AI Agent for Biological Research</p>
+                            <p class="desc">An intelligent agent system for life-science research, assisting with literature search, data analysis, gene exploration, and knowledge organization.</p>
+                            <a class="project-btn" href="#">Learn more <span class="arr">→</span></a>
+                        </div>
+                    </article>
+
+                    <!-- GeneViz -->
+                    <article class="project-card card-sm reveal" data-delay="3">
+                        <div class="card-visual" style="background: radial-gradient(120% 120% at 50% 100%, rgba(23,162,184,0.16), transparent 60%);"></div>
+                        <div class="card-body">
+                            <div class="project-tags"><span>Visualization</span><span>Algorithms</span></div>
+                            <h3>GeneViz</h3>
+                            <p class="sub">Interactive Genomic Visualization</p>
+                            <p class="desc">A modern interactive visualization framework for genomic data.</p>
+                            <a class="project-btn" href="#">Learn more <span class="arr">→</span></a>
+                        </div>
+                    </article>
+
+                    <!-- Filll AI Lab -->
+                    <article class="project-card card-md reveal" data-delay="2">
+                        <div class="card-visual" style="background: radial-gradient(120% 120% at 30% 80%, rgba(163,214,47,0.2), transparent 55%), radial-gradient(100% 100% at 90% 20%, rgba(110,98,224,0.14), transparent 55%);"></div>
+                        <div class="card-body">
+                            <div class="project-tags"><span>LLM</span><span>Agent</span><span>Multimodal</span></div>
+                            <h3>Filll AI Lab</h3>
+                            <p class="sub">Experimental AI Playground</p>
+                            <p class="desc">A playground for testing the latest AI models, agent workflows, and scientific intelligence applications.</p>
+                            <a class="project-btn" href="#">Learn more <span class="arr">→</span></a>
+                        </div>
+                    </article>
+                </div>
+
+                <span class="projects-more reveal">View all projects <span aria-hidden="true">→</span></span>
+            </div>
+        </section>
+
+        <!-- ============================ 04 / MANIFESTO ============================ -->
+        <section class="manifesto section" id="manifesto">
+            <div class="wrap">
+                <div class="manifesto-grid">
+                    <div class="reveal">
+                        <span class="eyebrow">04 / Manifesto</span>
+                        <h2 class="manifesto-title">We build at the <em>intersection</em> of science and technology.</h2>
+                    </div>
+                    <div class="manifesto-right reveal" data-delay="1">
+                        <p>We believe the most important scientific discoveries of the future will emerge where disciplines meet. Biology needs better computational methods, artificial intelligence needs to understand the complex knowledge of the real world, and software is becoming part of the infrastructure of modern science.</p>
+                        <p class="strong">So we don't just study problems — we design tools, build databases, ship software, and document the process along the way.</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        
-
-
-
-        <!-- Team Preview -->
-        <section class="max-w-[1440px] mx-auto px-6 md:px-12 py-24">
-            <h2 class="text-3xl font-medium mb-12">开发者团队</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
-                <!-- Team Member 1 -->
-                <div class="group">
-                    <div
-                        class="aspect-[4/5] bg-stone-200 mb-4 overflow-hidden relative grayscale group-hover:grayscale-0 transition-all duration-500">
-                        <!-- 这里放置图片，目前用占位色块 -->
-                        <div class="w-full h-full bg-gradient-to-br from-stone-300 to-stone-400"></div>
+        <!-- ============================ 05 / AI FOR SCIENCE ============================ -->
+        <section id="ai-for-science">
+            <div class="light-section">
+                <div class="wrap">
+                    <div class="sec-head reveal">
+                        <span class="eyebrow">05 / AI for Science</span>
+                        <h2 class="title">Can machines help us understand life?</h2>
+                        <p class="lead">Biology is becoming a data-intensive science. We believe the next generation of AI will do more than generate content — it will understand scientific data, connect knowledge, and assist discovery.</p>
                     </div>
-                    <h3 class="font-medium text-lg">Jewel</h3>
-                    <p class="text-stone-500 text-sm mt-1">创始人 & 独立开发者</p>
-                </div>
-                <!-- Team Member 2 -->
-                <div class="group">
-                    <div
-                        class="aspect-[4/5] bg-stone-200 mb-4 overflow-hidden relative grayscale group-hover:grayscale-0 transition-all duration-500">
-                        <div class="w-full h-full bg-gradient-to-br from-stone-300 to-stone-400"></div>
-                    </div>
-                    <h3 class="font-medium text-lg">James Carter</h3>
-                    <p class="text-stone-500 text-sm mt-1">云计算事业部CTO</p>
-                </div>
-                <!-- Team Member 3 -->
-                <div class="group">
-                    <div
-                        class="aspect-[4/5] bg-stone-200 mb-4 overflow-hidden relative grayscale group-hover:grayscale-0 transition-all duration-500">
-                        <div class="w-full h-full bg-gradient-to-br from-stone-300 to-stone-400"></div>
-                    </div>
-                    <h3 class="font-medium text-lg">Dr. Sarah Chen</h3>
-                    <p class="text-stone-500 text-sm mt-1">基因组学研究员</p>
-                </div>
-                <!-- Team Member 4 -->
-                <div class="group">
-                    <div
-                        class="aspect-[4/5] bg-stone-200 mb-4 overflow-hidden relative grayscale group-hover:grayscale-0 transition-all duration-500">
-                        <div class="w-full h-full bg-gradient-to-br from-stone-300 to-stone-400"></div>
-                    </div>
-                    <h3 class="font-medium text-lg">David Kim</h3>
-                    <p class="text-stone-500 text-sm mt-1">平台工程师</p>
-                </div>
 
+                    <div class="aiflow reveal">
+                        <div class="aiflow-col">
+                            <span class="col-head">BIOLOGICAL DATA</span>
+                            <h4 class="col-title">Data</h4>
+                            <ul><li>Genome</li><li>Transcriptome</li><li>Phenotype</li><li>Literature</li></ul>
+                        </div>
+                        <div class="aiflow-arrow" aria-hidden="true">→</div>
+                        <div class="aiflow-col">
+                            <span class="col-head">ARTIFICIAL INTELLIGENCE</span>
+                            <h4 class="col-title">Model</h4>
+                            <ul><li>Foundation Models</li><li>Machine Learning</li><li>Knowledge Graph</li><li>AI Agents</li></ul>
+                        </div>
+                        <div class="aiflow-arrow" aria-hidden="true">→</div>
+                        <div class="aiflow-col">
+                            <span class="col-head">SCIENTIFIC DISCOVERY</span>
+                            <h4 class="col-title">Discovery</h4>
+                            <ul><li>Prediction</li><li>Hypothesis</li><li>Visualization</li><li>Knowledge</li></ul>
+                        </div>
+                    </div>
 
+                    <p class="aiflow-note reveal">From data to model to discovery — AI should not just generate content. It should become the infrastructure for understanding life, connecting knowledge, and accelerating scientific discovery.</p>
+                </div>
             </div>
-
-
-
         </section>
 
-        <section class="relative w-full border-b border-arc-border overflow-hidden">
+        <!-- ============================ 06 / SOFTWARE ============================ -->
+        <section class="section" id="software">
+            <div class="wrap">
+                <div class="sec-head reveal">
+                    <span class="eyebrow">06 / Software</span>
+                    <h2 class="title">From ideas to systems.</h2>
+                    <p class="lead">Research should not stop at analysis. Good ideas deserve good software.</p>
+                </div>
 
-            <!-- === 视频背景层 === -->
-            <!-- autoplay:自动播放 loop:循环 muted:静音(浏览器限制必须静音才能自动播) playsinline:手机端内联播放 -->
-            <video autoplay loop muted playsinline class="absolute inset-0 w-full h-full object-cover z-0">
-                <!-- 请将下面的 'your-video.mp4' 换成你实际的视频文件名 -->
-                <source src="Protein2.mp4" type="video/mp4">
-            </video>
+                <div class="soft-grid">
+                    <article class="soft-card reveal">
+                        <div class="ico">◈</div>
+                        <h3>Research Platforms</h3>
+                        <ul><li>Scientific database</li><li>Bioinformatics platform</li><li>Data visualization</li></ul>
+                    </article>
+                    <article class="soft-card reveal" data-delay="1">
+                        <div class="ico">✦</div>
+                        <h3>AI Applications</h3>
+                        <ul><li>AI Agent</li><li>RAG systems</li><li>LLM applications</li></ul>
+                    </article>
+                    <article class="soft-card reveal" data-delay="2">
+                        <div class="ico">⌘</div>
+                        <h3>Web Engineering</h3>
+                        <ul><li>Modern Web App</li><li>Interactive UI</li><li>API platform</li></ul>
+                    </article>
+                    <article class="soft-card reveal" data-delay="3">
+                        <div class="ico">❯_</div>
+                        <h3>Developer Tools</h3>
+                        <ul><li>CLI</li><li>SDK</li><li>API</li><li>Open Source</li></ul>
+                    </article>
+                </div>
+
+                <p class="soft-quote reveal">Research should not stop at analysis.<br><span class="lime">Good ideas deserve good software.</span></p>
+            </div>
         </section>
 
+        <!-- ============================ 07 / ABOUT ============================ -->
+        <section class="section" id="about">
+            <div class="wrap">
+                <div class="sec-head reveal">
+                    <span class="eyebrow">07 / About</span>
+                    <h2 class="title">We are building at the intersection of science and technology.</h2>
+                </div>
 
+                <div class="about-grid">
+                    <div class="about-body reveal">
+                        <p>Filll Studio (飞荔科学) is an independent science and technology studio. We work at the intersection of artificial intelligence, life science, algorithms, and software engineering, and we try to connect these fields together.</p>
+                        <p>We believe the most important scientific discoveries of the future will emerge where disciplines meet: biology needs more advanced computational methods, artificial intelligence needs to understand the complex knowledge of the real world, and software is becoming part of the infrastructure of modern science.</p>
+                        <p>So we don't just study problems — we design tools, build databases, develop software, and document the journey.</p>
+                    </div>
+
+                    <aside class="about-aside reveal" data-delay="1">
+                        <h4>Studio</h4>
+                        <dl class="kv">
+                            <div><dt>Name</dt><dd>Filll Studio</dd></div>
+                            <div><dt>Focus</dt><dd>AI × Bioscience + Software</dd></div>
+                            <div><dt>Email</dt><dd>admin@filll.cn</dd></div>
+                            <div><dt>WeChat</dt><dd>Bioinformatics Notes</dd></div>
+                        </dl>
+                    </aside>
+                </div>
+            </div>
+        </section>
 
     </main>
 
-
-
-    <!-- Footer -->
-    <footer class="bg-white border-t border-arc-border pt-16 pb-8">
-        <div class="max-w-[1440px] mx-auto px-6 md:px-12">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
-                <div class="col-span-1 md:col-span-2">
-                    <a href="#" class="text-xl font-semibold tracking-tight flex items-center gap-2 mb-6">
-                        <div class="w-4 h-4 bg-stone-800 rounded-full"></div>
-                        Filll Studio
-                    </a>
-                    <p class="text-stone-500 max-w-sm text-sm leading-relaxed">
-                        Filll Studio 致力于通过前沿技术推动科学研究的发展。
-                        我们相信开放协作与创新技术的结合能够解锁生命科学的新篇章。
-                    </p>
+    <!-- ============================ Footer ============================ -->
+    <footer class="site-footer">
+        <div class="wrap">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="#top" class="brand">Filll Studio</a>
+                    <p>Exploring the intersection of intelligence, life, and computation. We study problems, design tools, build databases, and ship software.</p>
                 </div>
-                <div>
-                    <h4 class="font-semibold mb-4 text-sm uppercase tracking-wider text-stone-400">快捷链接</h4>
-                    <ul class="space-y-3 text-sm">
-                        <li><a href="#" class="hover-underline-animation">关于我们</a></li>
-                        <li><a href="#" class="hover-underline-animation">科学研究</a></li>
-                        <li><a href="#" class="hover-underline-animation">招聘公告</a></li>
-                    </ul>
+                <div class="footer-col">
+                    <h4>Site</h4>
+                    <a href="#explore">Explore</a>
+                    <a href="#network">Research</a>
+                    <a href="#projects">Projects</a>
+                    <a href="#ai-for-science">AI for Science</a>
+                    <a href="#software">Software</a>
+                    <a href="#about">About</a>
                 </div>
-                <div>
-                    <h4 class="font-semibold mb-4 text-sm uppercase tracking-wider text-stone-400">联系我们</h4>
-                    <ul class="space-y-3 text-sm text-stone-600">
-                        <li>Email: admin@filll.cn</li>
-                        <li>Wechat:18049157871</li>
-                        <li>微信公众号：生信分析笔记</li>
-                    </ul>
+                <div class="footer-col">
+                    <h4>Tools</h4>
+                    <a href="tools/ANOVA" target="_blank" rel="noopener">ANOVA</a>
+                    <a href="tools/merge_fa" target="_blank" rel="noopener">MergeFa</a>
+                    <a href="tools/GetKmer" target="_blank" rel="noopener">GetKmer</a>
+                    <a href="tools/MutiCompare" target="_blank" rel="noopener">MutiCompare</a>
+                    <a href="WheatTools/GeneID" target="_blank" rel="noopener">WheatGeneID</a>
+                    <a href="http://10.33.34.55:3455/" target="_blank" rel="noopener">CDRT</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Contact</h4>
+                    <li>Email: admin@filll.cn</li>
+                    <li>WeChat: 18049157871</li>
+                    <li>WeChat: Bioinformatics Notes</li>
                 </div>
             </div>
-            <div
-                class="border-t border-arc-border pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-stone-400">
-                <p>&copy; 2025 Filll , Inc. All rights reserved.</p>
-                <div class="flex gap-6 mt-4 md:mt-0">
-                    <a href="#" class="hover:text-stone-600">Privacy Policy</a>
-                    <a href="https://beian.miit.gov.cn/" class="hover:text-stone-600">陕ICP备2023016374号-1</a>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 Filll Studio. All rights reserved.</p>
+                <div>
+                    <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener">陕ICP备2023016374号-1</a>
                 </div>
             </div>
         </div>
     </footer>
 
-    <script>
-        // 获取元素
-        const btn = document.getElementById('mobile-menu-btn');
-        const menu = document.getElementById('mobile-menu');
-
-        // 添加点击事件监听
-        btn.addEventListener('click', () => {
-            // 切换 hidden 类：如果有就去掉（显示），如果没有就加上（隐藏）
-            menu.classList.toggle('hidden');
-        });
-    </script>
-
+    <!-- Interaction logic -->
+    <script src="js/filll.js"></script>
+    <!-- Explore section Three.js animations -->
+    <script type="module" src="js/explore-three.js"></script>
 </body>
 
 </html>
