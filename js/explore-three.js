@@ -14,11 +14,11 @@ import * as THREE from 'three';
 /* ============================ 配置 ============================ */
 const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// 品牌亮色（在深色视觉窗口上更鲜艳）
-const LIME   = '#C8F06A';
-const GREEN  = '#4ADE80';
-const PURPLE = '#9B8BFF';
-const CYAN   = '#5FD6E8';
+// 品牌珊瑚暖色阶（在深色视觉窗口上更温暖）
+const LIME   = '#E8B49A';   // 浅珊瑚 —— 高光 / 流动光点
+const GREEN  = '#CC785C';   // 主珊瑚
+const PURPLE = '#C1664A';   // 赤陶
+const CYAN   = '#D98C70';   // 中珊瑚
 
 /* ============================ 共享光晕纹理 ============================ */
 function makeGlowTexture(size = 64) {
