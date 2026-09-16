@@ -15,11 +15,6 @@
 
     <!-- Brand design system -->
     <link rel="stylesheet" href="css/filll.css">
-
-    <!-- Three.js import map (for Explore section animations) -->
-    <script type="importmap">
-        { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
-    </script>
 </head>
 
 <body>
@@ -31,7 +26,6 @@
 
             <nav class="nav-links" aria-label="Primary navigation">
                 <a href="#explore">Explore</a>
-                <a href="#network">Research</a>
                 <a href="#projects">Projects</a>
                 <a href="#ai-for-science">AI for Science</a>
                 <a href="#software">Software</a>
@@ -49,7 +43,6 @@
     <!-- Mobile menu -->
     <div class="mobile-menu" id="mobile-menu">
         <a href="#explore">Explore</a>
-        <a href="#network">Research</a>
         <a href="#projects">Projects</a>
         <a href="#ai-for-science">AI for Science</a>
         <a href="#software">Software</a>
@@ -60,30 +53,22 @@
 
         <!-- ============================ Hero ============================ -->
         <section class="hero">
-            <!-- Video background layer -->
-            <div class="hero-media">
-                <video autoplay loop muted playsinline>
-                    <source src="Protein.mp4" type="video/mp4">
-                </video>
-            </div>
-            <!-- Particle network animation -->
-            <canvas class="hero-particles" id="hero-particles" aria-hidden="true"></canvas>
-
-            <div class="wrap hero-content">
-                <span class="hero-badge"><span class="dot"></span>https://Filll.cn</span>
-                <h1 class="hero-title">Where science<br>meets <span class="accent">computation</span>.</h1>
-                <p class="hero-lead">
-                    The most exciting questions in science today are crossing traditional disciplinary boundaries.
-                    Artificial intelligence is changing how we understand data, bioscience is generating information
-                    at an unprecedented scale, and algorithms and software are becoming part of scientific discovery
-                    itself. Filll Studio exists to explore the connections between these fields.
-                </p>
-                <span class="hero-tag">Exploring Intelligence, Life &amp; Computation</span>
-            </div>
-
-            <div class="hero-scroll" aria-hidden="true">
-                <span>SCROLL</span>
-                <span class="arrow"></span>
+            <div class="wrap">
+                <div class="hero-video">
+                    <video autoplay loop muted playsinline>
+                        <source src="Protein.mp4" type="video/mp4">
+                    </video>
+                    <h1 class="hero-title">Where science<br>meets <span class="accent">computation</span>.</h1>
+                </div>
+                <div class="hero-content">
+                    <p class="hero-lead">
+                        The most exciting questions in science today are crossing traditional disciplinary boundaries.
+                        Artificial intelligence is changing how we understand data, bioscience is generating information
+                        at an unprecedented scale, and algorithms and software are becoming part of scientific discovery
+                        itself. Filll Studio exists to explore the connections between these fields.
+                    </p>
+                    <span class="hero-tag">Exploring Intelligence, Life &amp; Computation</span>
+                </div>
             </div>
         </section>
 
@@ -93,129 +78,32 @@
                 <div class="sec-head reveal">
                     <span class="eyebrow">01 / Explore</span>
                     <h2 class="title">We work at the intersection of life, intelligence, and computation.</h2>
-                    <p class="lead">
-                        Artificial intelligence, bioscience, advanced algorithms, and software engineering come
-                        together to create new research tools and digital products. These are not four separate
-                        lines of business, but a single unifying narrative.
-                    </p>
                 </div>
 
-                <div class="explore-list">
-
-                    <!-- AI -->
-                    <article class="explore-item">
-                        <div>
-                            <span class="explore-index">01</span>
-                            <h3><span class="kicker">Machine Intelligence</span>Artificial Intelligence</h3>
-                            <div class="explore-tags">
-                                <span>Large Language Models</span><span>AI Agents</span><span>Multimodal AI</span>
-                                <span>Scientific AI</span><span>Knowledge Systems</span><span>Machine Learning</span>
-                            </div>
-                            <p class="explore-desc">Exploring how AI understands complex knowledge, processes scientific data, and becomes a new kind of tool for research and creation.</p>
-                        </div>
-                        <div class="explore-visual" data-anim="ai">
-                            <span class="visual-caption">Neural Network · Embedding Space</span>
-                        </div>
+                <div class="explore-grid">
+                    <article class="explore-card">
+                        <span class="explore-index">01</span>
+                        <h3><span class="kicker">Machine Intelligence</span>Artificial Intelligence</h3>
+                        <p class="explore-desc">Exploring how AI understands complex knowledge, processes scientific data, and becomes a new kind of tool for research and creation.</p>
                     </article>
 
-                    <!-- Bioscience -->
-                    <article class="explore-item">
-                        <div>
-                            <span class="explore-index">02</span>
-                            <h3><span class="kicker">Computational Biology</span>Bioscience</h3>
-                            <div class="explore-tags">
-                                <span>Genomics</span><span>Pangenomics</span><span>Bioinformatics</span>
-                                <span>Genetics</span><span>Plant Science</span><span>Scientific Databases</span>
-                            </div>
-                            <p class="explore-desc">From genomes to complex living systems, using computational methods to understand life's information and genetic variation.</p>
-                        </div>
-                        <div class="explore-visual" data-anim="bioscience">
-                            <span class="visual-caption">DNA Double Helix · Genomics</span>
-                        </div>
+                    <article class="explore-card">
+                        <span class="explore-index">02</span>
+                        <h3><span class="kicker">Computational Biology</span>Bioscience</h3>
+                        <p class="explore-desc">From genomes to complex living systems, using computational methods to understand life's information and genetic variation.</p>
                     </article>
 
-                    <!-- Algorithms -->
-                    <article class="explore-item">
-                        <div>
-                            <span class="explore-index">03</span>
-                            <h3><span class="kicker">Algorithms &amp; Computation</span>Algorithms</h3>
-                            <div class="explore-tags">
-                                <span>Optimization</span><span>Graph Algorithms</span><span>Data Structures</span>
-                                <span>Statistical Computing</span><span>Machine Learning Algorithms</span><span>High-performance Computing</span>
-                            </div>
-                            <p class="explore-desc">Turning mathematical ideas into computational methods that solve real problems.</p>
-                        </div>
-                        <div class="explore-visual" data-anim="algorithms">
-                            <span class="visual-caption">Graph · Matrix · Optimization</span>
-                        </div>
+                    <article class="explore-card">
+                        <span class="explore-index">03</span>
+                        <h3><span class="kicker">Algorithms &amp; Computation</span>Algorithms</h3>
+                        <p class="explore-desc">Turning mathematical ideas into computational methods that solve real problems.</p>
                     </article>
 
-                    <!-- Software -->
-                    <article class="explore-item">
-                        <div>
-                            <span class="explore-index">04</span>
-                            <h3><span class="kicker">Software Engineering</span>Software</h3>
-                            <div class="explore-tags">
-                                <span>Web Applications</span><span>Scientific Software</span><span>Data Platforms</span>
-                                <span>APIs</span><span>Visualization</span><span>Developer Tools</span>
-                            </div>
-                            <p class="explore-desc">Turning research, algorithms, and ideas into software systems that people can actually use.</p>
-                        </div>
-                        <div class="explore-visual" data-anim="software">
-                            <span class="visual-caption">System · Architecture · Code</span>
-                        </div>
+                    <article class="explore-card">
+                        <span class="explore-index">04</span>
+                        <h3><span class="kicker">Software Engineering</span>Software</h3>
+                        <p class="explore-desc">Turning research, algorithms, and ideas into software systems that people can actually use.</p>
                     </article>
-
-                </div>
-            </div>
-        </section>
-
-        <!-- ============================ 02 / INTERDISCIPLINARY ============================ -->
-        <section class="section" id="network" style="padding-top: 0;">
-            <div class="wrap">
-                <div class="sec-head reveal">
-                    <span class="eyebrow">02 / Interdisciplinary</span>
-                    <h2 class="title">Everything is connected.</h2>
-                    <p class="lead">
-                        Filll Studio is not four separate directions, but one interdisciplinary research effort.
-                        Hover over any node to see how it lights up its connections to neighboring fields.
-                    </p>
-                </div>
-
-                <div class="netmap reveal">
-                    <svg viewBox="0 0 900 560" role="img" aria-label="Interdisciplinary network map">
-                        <!-- Edges -->
-                        <line class="map-edge" data-a="llm"      data-b="agents"   x1="450" y1="45"  x2="450" y2="115"/>
-                        <line class="map-edge" data-a="agents"   data-b="ml"       x1="450" y1="115" x2="450" y2="185"/>
-                        <line class="map-edge" data-a="ml"       data-b="bioinfo"  x1="450" y1="185" x2="390" y2="265"/>
-                        <line class="map-edge" data-a="ml"       data-b="algo"     x1="450" y1="185" x2="620" y2="255"/>
-                        <line class="map-edge" data-a="genomics" data-b="bioinfo"  x1="200" y1="255" x2="390" y2="265"/>
-                        <line class="map-edge" data-a="genomics" data-b="pangenome" x1="200" y1="255" x2="150" y2="335"/>
-                        <line class="map-edge" data-a="bioinfo"  data-b="algo"     x1="390" y1="265" x2="620" y2="255"/>
-                        <line class="map-edge" data-a="pangenome" data-b="genetics" x1="150" y1="335" x2="200" y2="420"/>
-                        <line class="map-edge" data-a="algo"     data-b="graph"    x1="620" y1="255" x2="620" y2="340"/>
-                        <line class="map-edge" data-a="genetics" data-b="graph"    x1="200" y1="420" x2="620" y2="340"/>
-                        <line class="map-edge" data-a="genetics" data-b="plantsci" x1="200" y1="420" x2="150" y2="500"/>
-                        <line class="map-edge" data-a="graph"    data-b="software" x1="620" y1="340" x2="620" y2="420"/>
-                        <line class="map-edge" data-a="software" data-b="viz"      x1="620" y1="420" x2="620" y2="500"/>
-                        <line class="map-edge" data-a="plantsci" data-b="scidb"    x1="150" y1="500" x2="330" y2="500"/>
-                        <line class="map-edge" data-a="scidb"    data-b="viz"      x1="330" y1="500" x2="620" y2="500"/>
-
-                        <!-- Nodes + labels -->
-                        <g><circle class="map-node" data-node="llm" cx="450" cy="45" r="9"/><text class="map-label" x="466" y="49">LLM</text></g>
-                        <g><circle class="map-node" data-node="agents" cx="450" cy="115" r="9"/><text class="map-label" x="466" y="119">AI Agents</text></g>
-                        <g><circle class="map-node" data-node="ml" cx="450" cy="185" r="9"/><text class="map-label" x="466" y="189">Machine Learning</text></g>
-                        <g><circle class="map-node" data-node="bioinfo" cx="390" cy="265" r="9"/><text class="map-label" x="408" y="269">Bioinformatics</text></g>
-                        <g><circle class="map-node" data-node="genomics" cx="200" cy="255" r="9"/><text class="map-label" x="184" y="259" text-anchor="end">Genomics</text></g>
-                        <g><circle class="map-node" data-node="pangenome" cx="150" cy="335" r="9"/><text class="map-label" x="134" y="339" text-anchor="end">Pangenome</text></g>
-                        <g><circle class="map-node" data-node="algo" cx="620" cy="255" r="9"/><text class="map-label" x="636" y="259">Algorithms</text></g>
-                        <g><circle class="map-node" data-node="graph" cx="620" cy="340" r="9"/><text class="map-label" x="636" y="344">Graph</text></g>
-                        <g><circle class="map-node" data-node="genetics" cx="200" cy="420" r="9"/><text class="map-label" x="184" y="424" text-anchor="end">Genetics</text></g>
-                        <g><circle class="map-node" data-node="plantsci" cx="150" cy="500" r="9"/><text class="map-label" x="134" y="504" text-anchor="end">Plant Science</text></g>
-                        <g><circle class="map-node" data-node="scidb" cx="330" cy="500" r="9"/><text class="map-label" x="346" y="504">Scientific DB</text></g>
-                        <g><circle class="map-node" data-node="software" cx="620" cy="420" r="9"/><text class="map-label" x="636" y="424">Software</text></g>
-                        <g><circle class="map-node" data-node="viz" cx="620" cy="500" r="9"/><text class="map-label" x="636" y="504">Visualization</text></g>
-                    </svg>
                 </div>
             </div>
         </section>
@@ -423,7 +311,6 @@
                 <div class="footer-col">
                     <h4>Site</h4>
                     <a href="#explore">Explore</a>
-                    <a href="#network">Research</a>
                     <a href="#projects">Projects</a>
                     <a href="#ai-for-science">AI for Science</a>
                     <a href="#software">Software</a>
@@ -440,9 +327,11 @@
                 </div>
                 <div class="footer-col">
                     <h4>Contact</h4>
-                    <li>Email: admin@filll.cn</li>
-                    <li>WeChat: 18049157871</li>
-                    <li>WeChat: Bioinformatics Notes</li>
+                    <ul>
+                        <li>Email: admin@filll.cn</li>
+                        <li>WeChat: 18049157871</li>
+                        <li>WeChat: Bioinformatics Notes</li>
+                    </ul>
                 </div>
             </div>
 
@@ -457,8 +346,6 @@
 
     <!-- Interaction logic -->
     <script src="js/filll.js"></script>
-    <!-- Explore section Three.js animations -->
-    <script type="module" src="js/explore-three.js"></script>
 </body>
 
 </html>
