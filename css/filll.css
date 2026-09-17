@@ -254,7 +254,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   border-bottom: 1px solid var(--dark-line);
 }
 
-/* ============================ Hero（视频限宽 + 暖墨衬线文字） ============================ */
+/* ============================ Hero（视频限宽 + 淡黄底 + 黑色文字） ============================ */
 .hero {
   position: relative;
   padding: calc(var(--nav-h) + 64px) 0 120px;
@@ -267,31 +267,28 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   border-radius: var(--radius);
   overflow: hidden;
   border: 1px solid var(--line);
-  background: #14110F;
+  background: var(--bg);
 }
 .hero-video video {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
-/* 视频上层纯色蒙版：均匀覆盖，保证文字可读 */
-.hero-video::after {
-  content: '';
+/* 文字层：叠加在视频上，居左，带极淡米白衬底 */
+.hero-overlay {
   position: absolute;
   inset: 0;
-  z-index: 1;
-  background: rgba(24, 18, 15, 0.45);
-  pointer-events: none;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 48px;
+  background: rgba(247, 244, 236, 0.5);
 }
 .hero-content {
   padding-top: 56px;
 }
 .hero-title {
-  position: absolute;
-  left: 48px;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 2;
   margin: 0;
   font-family: var(--font-serif);
   font-size: clamp(40px, 6.5vw, 78px);
@@ -299,17 +296,16 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   letter-spacing: -0.015em;
   font-weight: 500;
   max-width: 16ch;
-  color: #FFFFFF;
-  text-shadow: 0 2px 30px rgba(0, 0, 0, 0.85), 0 1px 3px rgba(0, 0, 0, 0.6);
+  color: var(--text);
 }
 .hero-title .accent {
-  color: #E8B49A;
+  color: var(--accent);
 }
 .hero-lead {
-  margin-top: 32px;
+  margin-top: 28px;
   font-size: 18px;
   line-height: 1.85;
-  color: var(--muted);
+  color: var(--text);
   max-width: 60ch;
 }
 .hero-lead strong { font-weight: 600; }
@@ -731,7 +727,9 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   .section { padding: 80px 0; }
   .nav-links { display: none; }
   .nav-burger { display: flex; }
-  .hero-title { font-size: clamp(32px, 9vw, 48px); left: 24px; }
+  .hero-title { font-size: clamp(32px, 9vw, 48px); }
+  .hero-overlay { padding: 24px; }
+  .hero-lead { font-size: 15px; }
   .hero-content { padding-top: 40px; }
   .bento { grid-template-columns: 1fr; }
   .card-lg { grid-column: span 1; }
