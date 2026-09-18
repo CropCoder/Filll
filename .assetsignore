@@ -1,0 +1,13 @@
+# Cloudflare Pages / Workers 静态资产排除清单（.gitignore 语法）
+# 这些文件/目录不参与部署，避免 .git 等本地内容被上传
+.git/
+.claude/
+.codex-pet-runs/
+.superpowers/
+.DS_Store
+**/.DS_Store
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+**/app_cache/
