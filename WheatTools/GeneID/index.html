@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gene ID Convert — Wheat Gene ID Batch Converter</title>
+
+  <!-- 字体：与 filll.cn 一致的字体栈（加载失败时优雅降级为系统衬线/无衬线/等宽） -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ============================================================================
+       设计系统 —— 对齐 filll.cn 品牌（Claude 暖纸色主题）
+       视觉关键词：暖奶油纸底 / 珊瑚 clay 强调 / 暖墨文字 / 衬线大标题 / 克制留白
+       ============================================================================ */
+    :root {
+      /* 暖纸色背景 */
+      --bg:        #F0EEE6;   /* 主背景 —— 暖奶油纸色 */
+      --bg-soft:   #E7E2D6;   /* 次级区块 —— 暖灰米 */
+      --bg-panel:  #FBF9F3;   /* 卡片面板 —— 暖白 */
+      --tint:      #EAE5D9;   /* 中性暖米 */
+
+      /* 品牌强调 —— 珊瑚 / 赤陶色阶 */
+      --coral:     #CC785C;   /* 主强调 —— 珊瑚 */
+      --accent:    #B85F43;   /* 深强调 —— 赤陶 */
+      --coral-mid: #D98C70;
+      --coral-lt:  #E8B49A;
+
+      /* 文字 —— 暖墨色 */
+      --text:      #141414;
+      --muted:     #6E6A60;
+      --faint:     #9C978B;
+
+      /* 描边 */
+      --line:        rgba(20, 20, 18, 0.10);
+      --line-strong: rgba(20, 20, 18, 0.16);
+
+      /* 尺寸 */
+      --nav-h: 68px;
+      --radius: 14px;
+      --radius-sm: 9px;
+
+      /* 字体 */
+      --font-sans:  'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+                    'HarmonyOS Sans SC', 'Source Han Sans SC', 'Microsoft YaHei', sans-serif;
+      --font-serif: 'Newsreader', 'Playfair Display', Georgia, 'Times New Roman', serif;
+      --font-mono:  'IBM Plex Mono', 'SFMono-Regular', 'SF Mono', Menlo, Consolas, monospace;
+
+      /* 发光 —— 珊瑚微光 */
+      --glow: 0 0 0 1px rgba(204, 120, 92, 0.35), 0 0 24px -12px rgba(204, 120, 92, 0.4);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: calc(var(--nav-h) + 12px); }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      font-size: 16px;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+    ::selection { background: rgba(204, 120, 92, 0.30); color: #141414; }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+    h1, h2, h3, h4 { margin: 0; font-weight: 500; letter-spacing: -0.02em; }
+
+    .wrap { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 32px; }
+
+    /* ==================== 点阵背景纹理 ==================== */
+    .bg-dots {
+      background-image: radial-gradient(rgba(20, 20, 18, 0.08) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+
+    /* ==================== 顶部导航 ==================== */
+    .site-nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      height: var(--nav-h);
+      background: rgba(240, 238, 230, 0.88);
+      backdrop-filter: blur(16px) saturate(1.2);
+      -webkit-backdrop-filter: blur(16px) saturate(1.2);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav-inner { height: 100%; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+    .brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 650; letter-spacing: -0.02em; font-size: 17px; }
+    .brand-mark {
+      width: 28px; height: 28px; border-radius: 8px; flex: none;
+      background: rgba(204, 120, 92, 0.16); color: var(--accent);
+      display: grid; place-items: center;
+      font-family: var(--font-mono); font-size: 15px; font-weight: 500;
+    }
+    .nav-links { display: flex; align-items: center; gap: 32px; }
+    .nav-links a { position: relative; font-size: 14px; color: var(--muted); padding: 6px 0; transition: color 0.2s ease; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a::after {
+      content: ''; position: absolute; left: 0; bottom: 0;
+      width: 100%; height: 1px; background: var(--coral);
+      transform: scaleX(0); transform-origin: right; transition: transform 0.28s ease;
+    }
+    .nav-links a:hover::after { transform: scaleX(1); transform-origin: left; }
+    @media (max-width: 768px) { .nav-links { display: none; } }
+
+    /* ==================== 主内容（为固定导航留白） ==================== */
+    main { padding-top: var(--nav-h); }
+
+    /* ==================== 卡片 ==================== */
+    .card {
+      background: var(--bg-panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+    }
+    .card-header {
+      padding: 18px 22px; border-bottom: 1px solid var(--line);
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .card-title { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+    .card-body { padding: 22px; }
+
+    /* ==================== 工具区网格 ==================== */
+    .tool-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 20px; }
+    @media (max-width: 860px) { .tool-grid { grid-template-columns: 1fr; } }
+
+    /* ==================== 表单控件 ==================== */
+    .label { display: block; font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 7px; }
+    .textarea, .select {
+      width: 100%; font-family: var(--font-mono); font-size: 13.5px; color: var(--text);
+      background: var(--bg-panel); border: 1px solid var(--line-strong);
+      border-radius: var(--radius-sm); padding: 11px 13px;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .select { font-family: var(--font-sans); }
+    .textarea:focus, .select:focus {
+      outline: none; border-color: var(--coral);
+      box-shadow: 0 0 0 3px rgba(204, 120, 92, 0.16);
+    }
+    .textarea { resize: vertical; min-height: 208px; line-height: 1.55; }
+    .field-hint { font-size: 12px; color: var(--faint); margin-top: 6px; }
+
+    /* ==================== 按钮 ==================== */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      font-size: 14px; font-weight: 500; padding: 10px 16px;
+      border-radius: 8px; border: 1px solid transparent; cursor: pointer;
+      transition: all 0.25s ease; white-space: nowrap;
+    }
+    .btn-primary { background: var(--coral); color: #fff; }
+    .btn-primary:hover { background: var(--accent); box-shadow: var(--glow); }
+    .btn-primary:disabled { background: var(--coral-lt); cursor: not-allowed; box-shadow: none; }
+    .btn-ghost { background: var(--bg-panel); color: var(--text); border-color: var(--line-strong); }
+    .btn-ghost:hover { background: var(--tint); }
+    .btn-outline { background: transparent; color: var(--accent); border-color: var(--coral); }
+    .btn-outline:hover { background: rgba(204, 120, 92, 0.12); }
+    .btn-sm { padding: 7px 13px; font-size: 13px; }
+    .btn-block { width: 100%; }
+
+    /* ==================== 徽章 ==================== */
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+      padding: 3px 10px; border-radius: 999px;
+    }
+    .badge-coral { background: rgba(204, 120, 92, 0.14); color: var(--accent); }
+    .badge-muted { background: var(--bg-soft); color: var(--muted); }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+    /* ==================== 进度条 ==================== */
+    .progress { height: 6px; background: var(--bg-soft); border-radius: 999px; overflow: hidden; }
+    .progress-bar {
+      height: 100%; border-radius: 999px; transition: width .12s ease;
+      background: linear-gradient(100deg, #CC785C, #B85F43);
+    }
+
+    /* ==================== 表格 ==================== */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+    thead th {
+      text-align: left; font-family: var(--font-mono); font-size: 11.5px; font-weight: 500;
+      letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted);
+      padding: 12px 16px; border-bottom: 1px solid var(--line-strong);
+      cursor: pointer; user-select: none; white-space: nowrap; background: var(--tint);
+    }
+    thead th:hover { color: var(--text); }
+    thead th .arrow { opacity: .45; font-size: 11px; margin-left: 3px; }
+    tbody td { padding: 11px 16px; border-bottom: 1px solid var(--line); color: var(--muted); }
+    tbody tr:hover { background: var(--bg-soft); }
+    tbody td.mono { font-family: var(--font-mono); font-size: 13px; color: var(--text); }
+    tbody tr.unmatched { background: rgba(204, 120, 92, 0.07); }
+    tbody tr.unmatched:hover { background: rgba(204, 120, 92, 0.13); }
+    .cell-empty { color: var(--faint); font-style: italic; font-family: var(--font-sans); }
+
+    /* ==================== 分页 ==================== */
+    .pagination { display: flex; align-items: center; gap: 6px; }
+    .pagination button {
+      min-width: 32px; height: 32px; padding: 0 8px; border-radius: 8px;
+      border: 1px solid var(--line); background: var(--bg-panel);
+      color: var(--muted); font-size: 13px; font-family: var(--font-mono); cursor: pointer;
+      transition: all .18s ease;
+    }
+    .pagination button:hover:not(:disabled) { border-color: var(--coral); color: var(--accent); }
+    .pagination button.active { background: var(--coral); border-color: var(--coral); color: #fff; }
+    .pagination button:disabled { opacity: .4; cursor: not-allowed; }
+
+    /* ==================== 工具栏 ==================== */
+    .toolbar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+    .search-input {
+      font-family: var(--font-sans); font-size: 13.5px; color: var(--text);
+      border: 1px solid var(--line-strong); border-radius: 8px;
+      padding: 8px 12px; min-width: 220px; background: var(--bg-panel);
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .search-input:focus { outline: none; border-color: var(--coral); box-shadow: 0 0 0 3px rgba(204,120,92,.14); }
+
+    /* ==================== 页脚 ==================== */
+    .site-footer {
+      margin-top: 80px; padding: 40px 0;
+      border-top: 1px solid var(--line); background: var(--bg-soft);
+      color: var(--muted); font-size: 13px;
+    }
+    .footer-inner { display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; align-items: center; }
+    .footer-inner a { color: var(--text); }
+    .footer-inner a:hover { color: var(--accent); }
+
+    .mt-3 { margin-top: 16px; }
+    .mt-4 { margin-top: 24px; }
+    .mb-2 { margin-bottom: 12px; }
+    .text-muted { color: var(--muted); }
+    .text-sm { font-size: 13px; }
+    .spacer { flex: 1; }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== 顶部导航 ==================== -->
+  <header class="site-nav">
+    <div class="wrap nav-inner">
+      <div class="brand">
+        <div class="brand-mark">G</div>
+        Gene ID Convert
+      </div>
+      <nav class="nav-links">
+        <a href="#converter">转换工具</a>
+        <a href="#help">使用说明</a>
+        <a href="mailto:admin@filll.cn">联系我们</a>
+        <a href="https://www.filll.cn" target="_blank" rel="noopener">飞荔计划</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap">
+
+      <!-- ==================== 提示卡片（工具简介 + 使用方法） ==================== -->
+      <section id="help" style="padding: 32px 0 4px;">
+        <div class="card">
+          <div class="card-header"><span class="card-title">使用说明</span></div>
+          <div class="card-body" style="color:var(--muted);">
+            <p style="margin:0 0 14px;">
+              本工具用于小麦中国春参考基因组基因 ID 的在线批量转换，支持 IAAS、CAU、CS1G、CS2G、CS3G
+              等多个版本之间的相互映射。全部计算在浏览器本地完成，数据无需上传服务器，安全便捷。
+            </p>
+            <p style="margin:0 0 6px; color:var(--text); font-weight:600;">使用方法：</p>
+            <ol style="margin:0 0 14px 18px; padding:0;">
+              <li>将待转换的基因 ID 整理为一列（每行一个），复制粘贴到下方输入框；</li>
+              <li>选择原始基因 ID 版本与目标基因 ID 版本；</li>
+              <li>点击「开始转换」，在结果表格中搜索、排序，并导出 CSV 或 Excel 文件。</li>
+            </ol>
+            <p style="margin:0;">
+              工具网址：<a href="https://filll.cn/WheatTools/GeneID" style="color:var(--accent);">https://filll.cn/WheatTools/GeneID</a>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 转换工具 ==================== -->
+      <section id="converter" class="bg-dots" style="padding: 4px; border-radius: 18px;">
+        <div class="tool-grid">
+
+          <!-- 输入卡片 -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">输入基因列表</span>
+              <span class="badge badge-muted" id="input_count">0 个基因</span>
+            </div>
+            <div class="card-body">
+              <textarea id="input_genes" class="textarea"
+                placeholder="请输入要转换的基因 ID（每行一个，或使用空格/制表符分隔）&#10;&#10;例如：&#10;CSIAAS1AG0000200LC&#10;CSIAAS1AG0000400HC&#10;TraesCS7D03G0267400&#10;TraesCSC1B01G013200&#10;TraesCSC1A01G002600LC&#10;TraesCSC1A01G000500LC"></textarea>
+              <div class="field-hint">每行一个基因 ID；批量转换已取消数量限制，可一次处理任意数量。</div>
+              <div class="toolbar mt-3">
+                <button class="btn btn-ghost btn-sm" id="btn_example">使用示例数据</button>
+                <button class="btn btn-ghost btn-sm" id="btn_clear">清空</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 参数卡片 -->
+          <div class="card">
+            <div class="card-header"><span class="card-title">转换参数</span></div>
+            <div class="card-body">
+              <div class="mb-2">
+                <label class="label" for="from_version">原始基因 ID 版本</label>
+                <select id="from_version" class="select"></select>
+              </div>
+              <div class="mb-2">
+                <label class="label" for="to_version">目标基因 ID 版本</label>
+                <select id="to_version" class="select"></select>
+              </div>
+              <div class="field-hint" style="margin-top:-2px;">两者不可相同，请按需选择。</div>
+              <button class="btn btn-primary btn-block mt-3" id="btn_convert">开始转换</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 进度条 -->
+        <div class="card mt-4" id="progress_card" style="display:none;">
+          <div class="card-body" style="padding: 16px 22px;">
+            <div class="toolbar">
+              <span class="text-sm" id="progress_text">转换中…</span>
+              <span class="spacer"></span>
+              <span class="text-sm text-muted" id="progress_pct">0%</span>
+            </div>
+            <div class="progress mt-3"><div class="progress-bar" id="progress_bar" style="width:0%"></div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 结果区 ==================== -->
+      <section id="result_section" class="mt-4" style="display:none;">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">转换结果</span>
+            <div style="display:flex; gap:8px;">
+              <span class="badge badge-muted" id="stat_total"></span>
+              <span class="badge badge-coral" id="stat_matched"></span>
+            </div>
+          </div>
+          <div class="card-body">
+            <!-- 工具栏 -->
+            <div class="toolbar mb-2">
+              <input type="text" class="search-input" id="search_box" placeholder="搜索基因 ID…" />
+              <span class="spacer"></span>
+              <button class="btn btn-ghost btn-sm" id="btn_csv">导出 CSV</button>
+              <button class="btn btn-outline btn-sm" id="btn_xlsx">导出 Excel</button>
+            </div>
+
+            <!-- 表格 -->
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width:52px; cursor:default;">#</th>
+                    <th data-sort="query">QueryGeneID <span class="arrow">⇅</span></th>
+                    <th data-sort="matched">MatchedSourceID <span class="arrow">⇅</span></th>
+                    <th data-sort="converted">ConvertedID <span class="arrow">⇅</span></th>
+                  </tr>
+                </thead>
+                <tbody id="result_tbody"></tbody>
+              </table>
+            </div>
+
+            <!-- 分页 -->
+            <div class="toolbar mt-4">
+              <span class="text-sm text-muted" id="page_info"></span>
+              <span class="spacer"></span>
+              <div class="pagination" id="pagination"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ==================== 页脚 ==================== -->
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <span>Gene ID Convert — 小麦中国春基因组基因 ID 批量转换工具</span>
+      <span>开发团队：Filll Studio &nbsp;·&nbsp; 微信公众号：生信分析笔记 &nbsp;·&nbsp; 联系邮箱：<a href="mailto:admin@filll.cn">admin@filll.cn</a></span>
+    </div>
+  </footer>
+
+  <!-- SheetJS：用于导出 Excel（xlsx） -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <script>
+  (function () {
+    "use strict";
+
+    /* ==================== 常量 ==================== */
+    var VERSIONS = ["IAAS", "CS3G", "CAU", "CS2G", "CS1G"]; // 版本顺序与原版一致
+    var EXAMPLE = "CSIAAS1AG0000200LC\nCSIAAS1AG0000400HC\nTraesCS7D03G0267400\nTraesCSC1B01G013200\nTraesCSC1A01G002600LC";
+
+    /* ==================== 状态 ==================== */
+    var state = {
+      results: [],      // 完整结果数组 [{query, matched, converted}]
+      filtered: [],     // 搜索过滤后的数组
+      cache: {},        // 源版本 -> 映射对象 {id: [targets...]}
+      loaded: {},       // 源版本 -> 是否已加载
+      sortKey: null,    // 当前排序列
+      sortDir: 1,       // 排序方向 1 升序 / -1 降序
+      page: 1,          // 当前页码
+      pageSize: 20      // 每页条数
+    };
+
+    /* ==================== DOM 引用 ==================== */
+    var el = {};
+    ["input_genes","input_count","from_version","to_version",
+     "btn_example","btn_clear","btn_convert",
+     "progress_card","progress_bar","progress_text","progress_pct",
+     "result_section","stat_total","stat_matched","search_box",
+     "result_tbody","page_info","pagination","btn_csv","btn_xlsx"
+    ].forEach(function (id) { el[id] = document.getElementById(id); });
+
+    /* ==================== 初始化下拉框 ==================== */
+    function initSelects() {
+      VERSIONS.forEach(function (v) {
+        el.from_version.add(new Option(v, v));
+        el.to_version.add(new Option(v, v));
+      });
+      el.from_version.value = VERSIONS[0]; // IAAS
+      el.to_version.value = VERSIONS[1];   // CS3G
+    }
+
+    /* ==================== 数据加载 ==================== */
+    function loadMap(src) {
+      if (state.loaded[src]) return Promise.resolve(state.cache[src]);
+      return fetch("data/map_" + src + ".json")
+        .then(function (r) { if (!r.ok) throw new Error("加载映射文件失败：" + src); return r.json(); })
+        .then(function (obj) { state.cache[src] = obj; state.loaded[src] = true; return obj; });
+    }
+
+    /* ==================== 输入解析 ==================== */
+    function parseGenes() {
+      // 按行切分，去除每行首尾空格，行内仍兼容空格/制表符分隔，最后过滤空项
+      var out = [];
+      el.input_genes.value.split(/\r?\n/).forEach(function (line) {
+        line.trim().split(/\s+/).forEach(function (g) {
+          if (g) out.push(g);
+        });
+      });
+      return out;
+    }
+    function updateCount() {
+      el.input_count.textContent = parseGenes().length + " 个基因";
+    }
+
+    /* ==================== 转换逻辑 ==================== */
+    function convert() {
+      var genes = parseGenes();
+      if (!genes.length) { alert("请输入要转换的基因 ID"); return; }
+
+      var src = el.from_version.value;
+      var dst = el.to_version.value;
+      if (src === dst) { alert("原始版本与目标版本不能相同"); return; }
+
+      var targets = VERSIONS.filter(function (v) { return v !== src; });
+      var dstIdx = targets.indexOf(dst);
+
+      // 显示进度
+      el.progress_card.style.display = "";
+      el.result_section.style.display = "none";
+      el.btn_convert.disabled = true;
+      el.btn_convert.textContent = "转换中…";
+      el.progress_bar.style.width = "0%";
+      el.progress_pct.textContent = "0%";
+
+      loadMap(src).then(function (map) {
+        var out = [];
+        var n = genes.length;
+        var i = 0;
+
+        // 分批异步处理，避免阻塞 UI 并更新进度
+        function step() {
+          var batch = Math.min(2000, n - i);
+          for (var k = 0; k < batch; k++, i++) {
+            var g = genes[i];
+            var row = map[g];
+            var hit = row && row.length === targets.length;
+            out.push({
+              query: g,
+              matched: hit ? g : "",
+              converted: hit ? row[dstIdx] : ""
+            });
+          }
+          var pct = Math.round((i / n) * 100);
+          el.progress_bar.style.width = pct + "%";
+          el.progress_pct.textContent = pct + "%";
+          el.progress_text.textContent = "已处理 " + i + " / " + n;
+
+          if (i < n) { setTimeout(step, 0); }
+          else { finish(out); }
+        }
+        step();
+      }).catch(function (err) {
+        console.error(err);
+        alert("转换出错：" + err.message);
+        resetConvertBtn();
+        el.progress_card.style.display = "none";
+      });
+    }
+
+    function finish(out) {
+      state.results = out;
+      state.filtered = out.slice();
+      state.page = 1;
+      state.sortKey = null;
+
+      el.progress_card.style.display = "none";
+      resetConvertBtn();
+      renderResult();
+    }
+
+    function resetConvertBtn() {
+      el.btn_convert.disabled = false;
+      el.btn_convert.textContent = "开始转换";
+    }
+
+    /* ==================== 结果渲染 ==================== */
+    function renderResult() {
+      el.result_section.style.display = "";
+      var total = state.results.length;
+      var matched = state.results.filter(function (r) { return r.converted !== ""; }).length;
+
+      el.stat_total.textContent = "共 " + total + " 条";
+      el.stat_matched.textContent = "匹配 " + matched + " 条";
+
+      // 应用排序
+      if (state.sortKey) {
+        var key = state.sortKey, dir = state.sortDir;
+        state.filtered.sort(function (a, b) {
+          var va = a[key], vb = b[key];
+          if (va < vb) return -dir;
+          if (va > vb) return dir;
+          return 0;
+        });
+      }
+
+      // 分页
+      var pages = Math.max(1, Math.ceil(state.filtered.length / state.pageSize));
+      if (state.page > pages) state.page = pages;
+      var start = (state.page - 1) * state.pageSize;
+      var pageRows = state.filtered.slice(start, start + state.pageSize);
+
+      // 渲染表体
+      var html = "";
+      if (!pageRows.length) {
+        html = '<tr><td colspan="4" class="text-muted" style="text-align:center;padding:32px;">无匹配结果</td></tr>';
+      } else {
+        var offset = start;
+        pageRows.forEach(function (r, idx) {
+          var no = offset + idx + 1;
+          var unmatched = r.converted === "";
+          html += '<tr' + (unmatched ? ' class="unmatched"' : '') + '>' +
+            '<td style="color:var(--faint);font-family:var(--font-mono);">' + no + '</td>' +
+            '<td class="mono">' + esc(r.query) + '</td>' +
+            '<td class="mono">' + (r.matched ? esc(r.matched) : '<span class="cell-empty">未匹配</span>') + '</td>' +
+            '<td class="mono">' + (r.converted ? esc(r.converted) : '<span class="cell-empty">未匹配</span>') + '</td>' +
+            '</tr>';
+        });
+      }
+      el.result_tbody.innerHTML = html;
+
+      // 分页信息
+      el.page_info.textContent = total
+        ? "显示 " + (start + 1) + "–" + Math.min(start + pageRows.length, state.filtered.length) + " / 共 " + state.filtered.length + " 条" +
+          (state.filtered.length !== total ? "（过滤自 " + total + "）" : "")
+        : "共 0 条";
+
+      renderPagination(pages);
+    }
+
+    function renderPagination(pages) {
+      if (pages <= 1) { el.pagination.innerHTML = ""; return; }
+      var cur = state.page, html = "";
+      html += pageBtn(cur - 1, "‹", cur <= 1);
+      for (var p = 1; p <= pages; p++) {
+        if (p === 1 || p === pages || (p >= cur - 2 && p <= cur + 2)) {
+          html += '<button data-page="' + p + '"' + (p === cur ? ' class="active"' : '') + '>' + p + '</button>';
+        } else if (p === cur - 3 || p === cur + 3) {
+          html += '<button disabled>…</button>';
+        }
+      }
+      html += pageBtn(cur + 1, "›", cur >= pages);
+      el.pagination.innerHTML = html;
+    }
+
+    function pageBtn(target, label, disabled) {
+      return '<button data-page="' + target + '"' + (disabled ? " disabled" : "") + '>' + label + '</button>';
+    }
+
+    function esc(s) {
+      return String(s).replace(/[&<>"]/g, function (c) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+      });
+    }
+
+    /* ==================== 下载 ==================== */
+    function dateStr() {
+      var d = new Date();
+      return d.getFullYear() + "-" +
+        String(d.getMonth() + 1).padStart(2, "0") + "-" +
+        String(d.getDate()).padStart(2, "0");
+    }
+
+    function exportCSV() {
+      if (!state.results.length) return;
+      var header = ["QueryGeneID", "MatchedSourceID", "ConvertedID"];
+      var lines = state.results.map(function (r) {
+        return [r.query, r.matched, r.converted].map(csvCell).join(",");
+      });
+      var csv = "﻿" + [header.join(",")].concat(lines).join("\r\n");
+      downloadBlob(new Blob([csv], { type: "text/csv;charset=utf-8" }),
+        "GeneConvertToCS_Result_" + dateStr() + ".csv");
+    }
+
+    function exportExcel() {
+      if (!state.results.length) return;
+      var ws = XLSX.utils.json_to_sheet(state.results.map(function (r) {
+        return { QueryGeneID: r.query, MatchedSourceID: r.matched, ConvertedID: r.converted };
+      }));
+      var wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Result");
+      XLSX.writeFile(wb, "GeneConvertToCS_Result_" + dateStr() + ".xlsx");
+    }
+
+    function csvCell(v) {
+      var s = String(v == null ? "" : v);
+      if (/[",\r\n]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+      return s;
+    }
+
+    function downloadBlob(blob, filename) {
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    /* ==================== 事件绑定 ==================== */
+    el.input_genes.addEventListener("input", updateCount);
+    el.btn_example.addEventListener("click", function () {
+      el.input_genes.value = EXAMPLE;
+      updateCount();
+    });
+    el.btn_clear.addEventListener("click", function () {
+      el.input_genes.value = "";
+      updateCount();
+    });
+    el.btn_convert.addEventListener("click", convert);
+
+    // 表头排序
+    document.querySelectorAll("thead th[data-sort]").forEach(function (th) {
+      th.addEventListener("click", function () {
+        var key = th.getAttribute("data-sort");
+        if (state.sortKey === key) { state.sortDir = -state.sortDir; }
+        else { state.sortKey = key; state.sortDir = 1; }
+        state.page = 1;
+        renderResult();
+      });
+    });
+
+    // 搜索过滤
+    el.search_box.addEventListener("input", function () {
+      var q = el.search_box.value.trim().toLowerCase();
+      state.filtered = q
+        ? state.results.filter(function (r) {
+            return (r.query + " " + r.matched + " " + r.converted).toLowerCase().indexOf(q) !== -1;
+          })
+        : state.results.slice();
+      state.page = 1;
+      renderResult();
+    });
+
+    // 分页点击（事件委托）
+    el.pagination.addEventListener("click", function (e) {
+      var btn = e.target.closest("button[data-page]");
+      if (!btn || btn.disabled) return;
+      state.page = parseInt(btn.getAttribute("data-page"), 10);
+      renderResult();
+    });
+
+    // 下载
+    el.btn_csv.addEventListener("click", exportCSV);
+    el.btn_xlsx.addEventListener("click", exportExcel);
+
+    /* ==================== 启动 ==================== */
+    initSelects();
+    updateCount();
+    // 预加载默认源版本映射，加速首次转换
+    loadMap(el.from_version.value).catch(function () {});
+  })();
+  </script>
+
+  <!-- 51.la 访问统计 -->
+  <script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+  <script>LA.init({ id: "KvVBIPwOZivo9Ibo", ck: "KvVBIPwOZivo9Ibo" });</script>
+</body>
+</html>

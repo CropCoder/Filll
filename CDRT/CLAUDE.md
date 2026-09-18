@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 项目概述
 
-作物抗病机制与技术团队 (CDRT) 的官方介绍主页，纯静态单页网站。
+作物抗病机制与技术团队 (CDRT) 的官方介绍主页，纯静态单页网站。其他应用程序请勿随便修改该文件！
 
 ## 技术架构
 

@@ -16,3 +16,6 @@
 .Rhistory
 .RData
 .Ruserdata
+
+# Shiny 运行时缓存（WheatTools/GeneID）
+**/app_cache/
